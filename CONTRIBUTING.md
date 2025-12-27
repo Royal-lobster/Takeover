@@ -1,6 +1,6 @@
-# Contributing to TakeOver 🎉
+# Contributing to InstallKit 🎉
 
-Thank you for your interest in contributing to TakeOver! We welcome contributions from everyone, whether it's adding new apps, fixing bugs, improving documentation, or suggesting new features.
+Thank you for your interest in contributing to InstallKit! We welcome contributions from everyone, whether it's adding new apps, fixing bugs, improving documentation, or suggesting new features.
 
 ## 📋 Table of Contents
 
@@ -20,7 +20,7 @@ This project and everyone participating in it is governed by our [Code of Conduc
 
 ### Reporting Bugs
 
-- Check if the bug has already been reported in [Issues](https://github.com/Royal-lobster/Takeover/issues)
+- Check if the bug has already been reported in [Issues](https://github.com/Royal-lobster/installkit/issues)
 - If not, create a new issue with a clear title and description
 - Include steps to reproduce, expected behavior, and actual behavior
 - Add screenshots if applicable
@@ -106,7 +106,7 @@ const DEVELOPMENT_APPS: Array<App> = [
 
 ### Icon Guide
 
-TakeOver uses two icon helper functions:
+InstallKit uses two icon helper functions:
 
 #### 1. `simpleIcon(iconName)`
 
@@ -223,14 +223,14 @@ const DEVELOPMENT_APPS: Array<App> = [
 2. **Clone your fork:**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Takeover.git
-cd Takeover
+git clone https://github.com/YOUR_USERNAME/installkit.git
+cd installkit
 ```
 
 3. **Add upstream remote:**
 
 ```bash
-git remote add upstream https://github.com/ORIGINAL_OWNER/Takeover.git
+git remote add upstream https://github.com/ORIGINAL_OWNER/installkit.git
 ```
 
 4. **Install dependencies:**
@@ -420,13 +420,13 @@ git push origin feature/add-my-apps
 
 ## 🤝 Need Help?
 
-- 💬 Open a [Discussion](https://github.com/Royal-lobster/Takeover/discussions) for questions
-- 🐛 Open an [Issue](https://github.com/Royal-lobster/Takeover/issues) for bugs
+- 💬 Open a [Discussion](https://github.com/Royal-lobster/installkit/discussions) for questions
+- 🐛 Open an [Issue](https://github.com/Royal-lobster/installkit/issues) for bugs
 - 📧 Reach out to maintainers
 
 ## 🎉 Recognition
 
-All contributors will be recognized in our README and release notes. Thank you for making TakeOver better!
+All contributors will be recognized in our README and release notes. Thank you for making InstallKit better!
 
 ---
 

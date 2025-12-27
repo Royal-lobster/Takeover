@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="./public/icon.svg" alt="TakeOver logo" width="120" />
+  <img src="./public/icon.svg" alt="InstallKit logo" width="120" />
 </p>
 
-<h1 align="center">TakeOver 🚀</h1>
+<h1 align="center">InstallKit 🚀</h1>
 
 <p align="center">A beautiful, modern web app to help you take over your new Mac by quickly installing all your favorite applications via Homebrew.</p>
 
@@ -39,8 +39,8 @@ Browse through curated categories of applications, select the ones you want, and
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/Royal-lobster/Takeover.git
-cd Takeover
+git clone https://github.com/Royal-lobster/installkit.git
+cd installkit
 ```
 
 2. Install dependencies:
@@ -73,7 +73,7 @@ pnpm dev
 ## 📁 Project Structure
 
 ```
-Takeover/
+installkit/
 ├── app/
 │   ├── (landing)/           # Landing page with app picker
 │   │   ├── _components/     # Landing page components
@@ -171,7 +171,7 @@ If you find this project helpful, please give it a ⭐️ on GitHub!
 
 ## 📧 Contact
 
-Have questions or suggestions? Feel free to [open an issue](https://github.com/Royal-lobster/Takeover/issues)!
+Have questions or suggestions? Feel free to [open an issue](https://github.com/Royal-lobster/installkit/issues)!
 
 ---
 

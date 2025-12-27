@@ -32,7 +32,7 @@ export function Header({
             </div>
             <div>
               <h1 className="font-mono text-sm font-bold tracking-tight">
-                TAKEOVER
+                INSTALLKIT
               </h1>
               <p className="font-mono text-[10px] text-muted-foreground">
                 Select apps → Copy brew command → Paste in terminal

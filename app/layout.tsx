@@ -4,9 +4,9 @@ import { Providers } from './(layout)/providers'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'TakeOver - Homebrew App Picker',
+  title: 'InstallKit - Homebrew App Picker',
   description:
-    'Select apps and generate a brew install command. Take over your Mac setup.',
+    'Select apps and generate a brew install command. Install your Mac essentials faster.',
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

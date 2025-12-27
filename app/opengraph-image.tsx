@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
 
-export const alt = 'TakeOver - Homebrew App Picker'
+export const alt = 'InstallKit - Homebrew App Picker'
 export const size = {
   width: 1200,
   height: 630,
@@ -62,7 +62,7 @@ export default async function Image() {
             letterSpacing: '-0.02em',
           }}
         >
-          TAKEOVER
+          INSTALLKIT
         </span>
       </div>
 
