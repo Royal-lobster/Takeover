@@ -6,10 +6,12 @@
 
 <p align="center">A beautiful, modern web app to help you take over your new Mac by quickly installing all your favorite applications via Homebrew.</p>
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
-![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=flat-square&logo=typescript)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5.7-blue?style=flat-square&logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
+</p>
 
 ## ✨ Features
 
