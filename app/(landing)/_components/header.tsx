@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  GithubLogo,
   MagnifyingGlassIcon,
   TerminalWindowIcon,
   XIcon,
@@ -25,7 +26,7 @@ export function Header({
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-background">
       <div className="mx-auto max-w-6xl px-4 py-3">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-2">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <TerminalWindowIcon className="size-5" weight="bold" />
@@ -38,9 +39,18 @@ export function Header({
                 Select apps → Copy brew command → Paste in terminal
               </p>
             </div>
+            <a
+              href="https://github.com/Royal-lobster/InstallKit"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:hidden"
+              aria-label="View source on GitHub"
+            >
+              <GithubLogo className="size-4" weight="bold" />
+            </a>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+            <div className="relative w-full sm:w-auto">
               <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="text"
@@ -49,7 +59,7 @@ export function Header({
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   onSearchChange(e.target.value)
                 }
-                className="h-8 w-40 pl-8 pr-8 font-mono text-xs md:w-56"
+                className="h-9 w-full pl-8 pr-8 font-mono text-sm sm:h-8 sm:w-56 sm:text-xs"
               />
               {searchQuery && (
                 <button
@@ -61,12 +71,21 @@ export function Header({
                 </button>
               )}
             </div>
+            <a
+              href="https://github.com/Royal-lobster/InstallKit"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:flex"
+              aria-label="View source on GitHub"
+            >
+              <GithubLogo className="size-4" weight="bold" />
+            </a>
             {selectedCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onClearAll}
-                className="font-mono text-xs"
+                className="w-full justify-center font-mono text-xs sm:w-auto"
               >
                 Clear ({selectedCount})
               </Button>
