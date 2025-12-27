@@ -1,59 +1,43 @@
-import { cn } from "@/lib/utils";
-import { type AppCategory, CATEGORIES } from "../../_schema";
+import {  CATEGORIES } from '../../_schema'
+import type {AppCategory} from '../../_schema';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 interface CategoryFilterProps {
-	selectedCategory: AppCategory | "all";
-	onCategoryChange: (category: AppCategory | "all") => void;
+  selectedCategory: AppCategory | 'all'
+  onCategoryChange: (category: AppCategory | 'all') => void
 }
 
 export function CategoryFilter({
-	selectedCategory,
-	onCategoryChange,
+  selectedCategory,
+  onCategoryChange,
 }: CategoryFilterProps) {
-	return (
-		<div className="flex flex-wrap gap-1.5">
-			<FilterButton
-				isSelected={selectedCategory === "all"}
-				onClick={() => onCategoryChange("all")}
-			>
-				All
-			</FilterButton>
-			{CATEGORIES.map((category) => (
-				<FilterButton
-					key={category.id}
-					isSelected={selectedCategory === category.id}
-					onClick={() => onCategoryChange(category.id)}
-				>
-					{category.label}
-				</FilterButton>
-			))}
-		</div>
-	);
-}
-
-function FilterButton({
-	children,
-	isSelected,
-	onClick,
-}: {
-	children: React.ReactNode;
-	isSelected: boolean;
-	onClick: () => void;
-}) {
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className={cn(
-				"border px-2.5 py-1 font-mono text-[11px] transition-colors",
-				"hover:bg-muted/50",
-				"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-				isSelected
-					? "border-primary bg-primary text-primary-foreground"
-					: "border-border bg-card text-muted-foreground hover:text-foreground",
-			)}
-		>
-			{children}
-		</button>
-	);
+  return (
+    <ToggleGroup
+      value={[selectedCategory]}
+      onValueChange={(values) => {
+        const newValue = values.find((v) => v !== selectedCategory)
+        if (newValue) {
+          onCategoryChange(newValue as AppCategory | 'all')
+        }
+      }}
+      spacing={1}
+      className="flex-wrap"
+    >
+      <ToggleGroupItem
+        value="all"
+        className="px-2.5 py-1 font-mono text-[11px]"
+      >
+        All
+      </ToggleGroupItem>
+      {CATEGORIES.map((category) => (
+        <ToggleGroupItem
+          key={category.id}
+          value={category.id}
+          className="px-2.5 py-1 font-mono text-[11px]"
+        >
+          {category.label}
+        </ToggleGroupItem>
+      ))}
+    </ToggleGroup>
+  )
 }
