@@ -1,6 +1,10 @@
-# TakeOver 🚀
+<p align="center">
+  <img src="./public/logo512.png" alt="TakeOver logo" width="120" />
+</p>
 
-> A beautiful, modern web app to help you take over your new Mac by quickly installing all your favorite applications via Homebrew.
+<h1 align="center">TakeOver 🚀</h1>
+
+<p align="center">A beautiful, modern web app to help you take over your new Mac by quickly installing all your favorite applications via Homebrew.</p>
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)
@@ -169,4 +173,4 @@ Have questions or suggestions? Feel free to [open an issue](https://github.com/R
 
 ---
 
-Built with ❤️ by [Your Name](https://github.com/Royal-lobster)
+Built with ❤️ by [Srujan](https://github.com/Royal-lobster)
