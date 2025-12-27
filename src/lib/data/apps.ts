@@ -20,6 +20,7 @@ export const AppSchema = z.object({
   category: AppCategoryEnum,
   description: z.string(),
   iconUrl: z.string(),
+  invertInDark: z.boolean().optional(),
 })
 
 export type App = z.infer<typeof AppSchema>
@@ -130,6 +131,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'AI-first code editor built for pair programming',
     iconUrl: simpleIcon('cursor'),
+    invertInDark: true,
   },
   {
     id: 'zed',
@@ -146,6 +148,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'Terminal emulator for macOS',
     iconUrl: simpleIcon('iterm2'),
+    invertInDark: true,
   },
   {
     id: 'warp',
@@ -186,6 +189,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'Git client by GitHub',
     iconUrl: simpleIcon('github'),
+    invertInDark: true,
   },
   {
     id: 'sourcetree',
@@ -258,6 +262,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'Universal database tool',
     iconUrl: simpleIcon('dbeaver'),
+    invertInDark: true,
   },
   {
     id: 'sequel-ace',
@@ -282,6 +287,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'Manage JetBrains IDEs',
     iconUrl: simpleIcon('jetbrains'),
+    invertInDark: true,
   },
   {
     id: 'intellij-idea-ce',
@@ -290,6 +296,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'Java IDE by JetBrains',
     iconUrl: simpleIcon('intellijidea'),
+    invertInDark: true,
   },
   {
     id: 'pycharm-ce',
@@ -298,6 +305,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'Python IDE by JetBrains',
     iconUrl: simpleIcon('pycharm'),
+    invertInDark: true,
   },
   {
     id: 'webstorm',
@@ -306,6 +314,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'JavaScript IDE by JetBrains',
     iconUrl: simpleIcon('webstorm'),
+    invertInDark: true,
   },
   {
     id: 'ngrok',
@@ -314,6 +323,7 @@ export const APPS: App[] = [
     category: 'development',
     description: 'Secure tunnels to localhost',
     iconUrl: simpleIcon('ngrok'),
+    invertInDark: true,
   },
   {
     id: 'proxyman',
@@ -347,6 +357,7 @@ export const APPS: App[] = [
     category: 'productivity',
     description: 'All-in-one workspace for notes and docs',
     iconUrl: simpleIcon('notion'),
+    invertInDark: true,
   },
   {
     id: 'obsidian',
@@ -588,6 +599,7 @@ export const APPS: App[] = [
     category: 'communication',
     description: 'Video conferencing by Cisco',
     iconUrl: simpleIcon('webex'),
+    invertInDark: true,
   },
   {
     id: 'skype',
@@ -677,6 +689,7 @@ export const APPS: App[] = [
     category: 'media',
     description: 'Free streaming and recording software',
     iconUrl: simpleIcon('obsstudio'),
+    invertInDark: true,
   },
   {
     id: 'streamlabs',
@@ -701,6 +714,7 @@ export const APPS: App[] = [
     category: 'media',
     description: 'Gaming platform by Valve',
     iconUrl: simpleIcon('steam'),
+    invertInDark: true,
   },
   {
     id: 'epic-games',
@@ -709,6 +723,7 @@ export const APPS: App[] = [
     category: 'media',
     description: 'Epic Games store and launcher',
     iconUrl: simpleIcon('epicgames'),
+    invertInDark: true,
   },
   {
     id: 'gog-galaxy',
@@ -822,6 +837,7 @@ export const APPS: App[] = [
     category: 'utilities',
     description: 'Free menu bar manager',
     iconUrl: simpleIcon('macos'),
+    invertInDark: true,
   },
   {
     id: 'hiddenbar',
@@ -870,6 +886,7 @@ export const APPS: App[] = [
     category: 'utilities',
     description: 'Inspect macOS installer packages',
     iconUrl: simpleIcon('macos'),
+    invertInDark: true,
   },
   {
     id: 'onyx',
@@ -878,6 +895,7 @@ export const APPS: App[] = [
     category: 'utilities',
     description: 'System maintenance and optimization',
     iconUrl: simpleIcon('macos'),
+    invertInDark: true,
   },
   {
     id: 'transmit',
@@ -999,6 +1017,7 @@ export const APPS: App[] = [
     category: 'security',
     description: "See what's persistently installed",
     iconUrl: simpleIcon('macos'),
+    invertInDark: true,
   },
   {
     id: 'blockblock',
@@ -1007,6 +1026,7 @@ export const APPS: App[] = [
     category: 'security',
     description: 'Monitor persistent components',
     iconUrl: simpleIcon('macos'),
+    invertInDark: true,
   },
   {
     id: 'gpg-suite',
@@ -1088,6 +1108,7 @@ export const APPS: App[] = [
     category: 'design',
     description: 'Free vector graphics editor',
     iconUrl: simpleIcon('inkscape'),
+    invertInDark: true,
   },
   {
     id: 'blender',

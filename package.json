@@ -37,6 +37,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^0.1.88",
     "@tanstack/devtools-vite": "^0.3.11",
     "@tanstack/eslint-config": "^0.3.0",
     "@testing-library/dom": "^10.4.0",
