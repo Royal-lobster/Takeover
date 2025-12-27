@@ -1,4 +1,4 @@
-import { type App, type AppCategory, CATEGORIES } from "../../lib/data/apps";
+import { type App, type AppCategory, CATEGORIES } from "../../_schema";
 import { AppCard } from "../_brew-picker/app-card";
 
 export function CategorySection({

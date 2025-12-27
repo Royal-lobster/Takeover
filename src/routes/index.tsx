@@ -1,13 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Fuse from "fuse.js";
 import * as React from "react";
-import {
-	APPS,
-	type App,
-	type AppCategory,
-	CATEGORIES,
-	generateBrewCommand,
-} from "../lib/data/apps";
+import { type App, type AppCategory, CATEGORIES } from "../_schema";
+import { APPS, generateBrewCommand } from "../lib/data/apps";
 import { AppCard } from "./_brew-picker/app-card";
 import { CategoryFilter } from "./_brew-picker/category-filter";
 import { CategorySection } from "./_layout/category-section";

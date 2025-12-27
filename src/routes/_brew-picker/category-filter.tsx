@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { type AppCategory, CATEGORIES } from "../../lib/data/apps";
+import { type AppCategory, CATEGORIES } from "../../_schema";
 
 interface CategoryFilterProps {
 	selectedCategory: AppCategory | "all";
