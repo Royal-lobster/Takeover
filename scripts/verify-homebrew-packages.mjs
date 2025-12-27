@@ -100,31 +100,55 @@ function generateIsCaskMap(results) {
 
 function updateAppsFile(appsContent, isCaskMap) {
 	let updated = appsContent;
+	let lines = updated.split('\n');
+	let result = [];
+	let i = 0;
 
-	// For each app, add isCask property based on brewName
-	// Find all app objects and update them
-	const appObjectRegex =
-		/\{\s*id:\s*"([^"]+)"[\s\S]*?brewName:\s*"([^"]+)"[\s\S]*?category:[\s\S]*?description:[\s\S]*?iconUrl:[^}]*?(invertInDark:[^}]*)?\}/g;
+	while (i < lines.length) {
+		let line = lines[i];
+		result.push(line);
 
-	updated = updated.replace(appObjectRegex, (match, id, brewName) => {
-		const isCask = isCaskMap[brewName];
+		// Check if this line contains brewName
+		const brewNameMatch = line.match(/brewName:\s*"([^"]+)"/);
+		if (brewNameMatch) {
+			const brewName = brewNameMatch[1];
+			const isCask = isCaskMap[brewName];
 
-		if (isCask === undefined) {
-			return match;
+			if (isCask !== undefined) {
+				// Look ahead to find where to insert isCask
+				let j = i + 1;
+				let foundIconUrl = false;
+
+				// Skip ahead until we find iconUrl or closing brace
+				while (j < lines.length) {
+					if (lines[j].includes('iconUrl:')) {
+						foundIconUrl = true;
+						// Add the iconUrl line
+						result.push(lines[j]);
+						// Then add isCask on next line if not already present
+						if (!lines[j + 1].includes('isCask:')) {
+							result.push(`\t\tisCask: ${isCask},`);
+						} else if (lines[j + 1].includes('isCask:')) {
+							// Update existing isCask
+							result.push(lines[j + 1].replace(/isCask:\s*(true|false)/, `isCask: ${isCask}`));
+						}
+						i = j + 1;
+						break;
+					} else if (lines[j].includes('},')) {
+						// End of object without iconUrl, insert before closing
+						result.push(`\t\tisCask: ${isCask},`);
+						i = j - 1;
+						break;
+					}
+					result.push(lines[j]);
+					j++;
+				}
+			}
 		}
+		i++;
+	}
 
-		// Check if isCask already exists
-		if (match.includes("isCask:")) {
-			// Update existing isCask
-			return match.replace(/isCask:\s*true|false/, `isCask: ${isCask}`);
-		}
-
-		// Add isCask property before iconUrl
-		const isCaskLine = `\n\t\tisCask: ${isCask},`;
-		return match.replace(/(iconUrl:[\s\S]*?),/, `$1,${isCaskLine}`);
-	});
-
-	return updated;
+	return result.join('\n');
 }
 
 function printReport(results) {
