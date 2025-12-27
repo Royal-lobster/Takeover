@@ -1,61 +1,61 @@
-import { homebrewApi } from './axios'
+import { homebrewApi } from "./axios";
 
 export type HomebrewInfo = {
-  name?: string
-  description?: string
-  homepage?: string
-  version?: string
-  url?: string
-  kind: 'cask' | 'formula'
-}
+  name?: string;
+  description?: string;
+  homepage?: string;
+  version?: string;
+  url?: string;
+  kind: "cask" | "formula";
+};
 
 type HomebrewEndpoint = {
-  path: string
-  kind: HomebrewInfo['kind']
-  pageUrl: string
-}
+  path: string;
+  kind: HomebrewInfo["kind"];
+  pageUrl: string;
+};
 
 function getEndpoints(brewName: string): Array<HomebrewEndpoint> {
   return [
     {
       path: `/cask/${brewName}.json`,
-      kind: 'cask',
+      kind: "cask",
       pageUrl: `https://formulae.brew.sh/cask/${brewName}`,
     },
     {
       path: `/formula/${brewName}.json`,
-      kind: 'formula',
+      kind: "formula",
       pageUrl: `https://formulae.brew.sh/formula/${brewName}`,
     },
-  ]
+  ];
 }
 
 function parseVersion(data: Record<string, unknown>): string | undefined {
-  if (typeof data.version === 'string') {
-    return data.version
+  if (typeof data.version === "string") {
+    return data.version;
   }
-  const versions = data.versions as Record<string, unknown> | undefined
-  if (typeof versions?.stable === 'string') {
-    return versions.stable
+  const versions = data.versions as Record<string, unknown> | undefined;
+  if (typeof versions?.stable === "string") {
+    return versions.stable;
   }
-  return undefined
+  return undefined;
 }
 
 function parseName(data: Record<string, unknown>): string | undefined {
-  const name = data.name
-  return Array.isArray(name) ? name[0] : (name as string | undefined)
+  const name = data.name;
+  return Array.isArray(name) ? name[0] : (name as string | undefined);
 }
 
 export async function fetchHomebrewInfo(
   brewName: string,
 ): Promise<HomebrewInfo> {
-  const endpoints = getEndpoints(brewName)
+  const endpoints = getEndpoints(brewName);
 
   for (const endpoint of endpoints) {
     try {
       const { data } = await homebrewApi.get<Record<string, unknown>>(
         endpoint.path,
-      )
+      );
 
       return {
         name: parseName(data),
@@ -64,9 +64,9 @@ export async function fetchHomebrewInfo(
         version: parseVersion(data),
         url: endpoint.pageUrl,
         kind: endpoint.kind,
-      }
+      };
     } catch {}
   }
 
-  throw new Error('No Homebrew metadata available')
+  throw new Error("No Homebrew metadata available");
 }

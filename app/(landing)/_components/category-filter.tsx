@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import type { AppCategory } from '@/lib/schema'
-import { ToggleGroup, ToggleGroupItem } from '@/app/components/ui/toggle-group'
+import type { AppCategory } from "@/lib/schema";
+import { ToggleGroup, ToggleGroupItem } from "@/app/components/ui/toggle-group";
 
 interface CategoryFilterProps {
-  categories: Array<{ id: AppCategory; label: string }>
-  selectedCategory: AppCategory | 'all'
-  onCategoryChange: (category: AppCategory | 'all') => void
+  categories: Array<{ id: AppCategory; label: string }>;
+  selectedCategory: AppCategory | "all";
+  onCategoryChange: (category: AppCategory | "all") => void;
 }
 
 export function CategoryFilter({
@@ -18,9 +18,9 @@ export function CategoryFilter({
     <ToggleGroup
       value={[selectedCategory]}
       onValueChange={(values: Array<string>) => {
-        const newValue = values.find((v) => v !== selectedCategory)
+        const newValue = values.find((v) => v !== selectedCategory);
         if (newValue) {
-          onCategoryChange(newValue as AppCategory | 'all')
+          onCategoryChange(newValue as AppCategory | "all");
         }
       }}
       spacing={1}
@@ -42,5 +42,5 @@ export function CategoryFilter({
         </ToggleGroupItem>
       ))}
     </ToggleGroup>
-  )
+  );
 }

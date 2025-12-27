@@ -1,44 +1,44 @@
-import { ImageResponse } from 'next/og'
+import { ImageResponse } from "next/og";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
-export const alt = 'InstallKit - Homebrew App Picker'
+export const alt = "InstallKit - Homebrew App Picker";
 export const size = {
   width: 1200,
   height: 630,
-}
-export const contentType = 'image/png'
+};
+export const contentType = "image/png";
 
 export default async function Image() {
   return new ImageResponse(
     <div
       style={{
-        background: '#1c1c1c',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '32px',
+        background: "#1c1c1c",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "32px",
       }}
     >
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '24px',
+          display: "flex",
+          alignItems: "center",
+          gap: "24px",
         }}
       >
         <div
           style={{
-            width: '96px',
-            height: '96px',
-            borderRadius: '16px',
-            background: '#85CD22',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            width: "96px",
+            height: "96px",
+            borderRadius: "16px",
+            background: "#85CD22",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <svg
@@ -55,11 +55,11 @@ export default async function Image() {
 
         <span
           style={{
-            fontSize: '72px',
+            fontSize: "72px",
             fontWeight: 700,
-            color: '#ffffff',
-            fontFamily: 'monospace',
-            letterSpacing: '-0.02em',
+            color: "#ffffff",
+            fontFamily: "monospace",
+            letterSpacing: "-0.02em",
           }}
         >
           INSTALLKIT
@@ -68,17 +68,17 @@ export default async function Image() {
 
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '16px',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "16px",
         }}
       >
         <span
           style={{
-            fontSize: '32px',
-            color: '#a3a3a3',
-            fontFamily: 'monospace',
+            fontSize: "32px",
+            color: "#a3a3a3",
+            fontFamily: "monospace",
           }}
         >
           Select apps → Copy brew command → Paste in terminal
@@ -86,19 +86,19 @@ export default async function Image() {
 
         <div
           style={{
-            marginTop: '24px',
-            padding: '16px 32px',
-            background: 'rgba(133, 205, 34, 0.1)',
-            border: '1px solid rgba(133, 205, 34, 0.3)',
-            borderRadius: '8px',
-            display: 'flex',
+            marginTop: "24px",
+            padding: "16px 32px",
+            background: "rgba(133, 205, 34, 0.1)",
+            border: "1px solid rgba(133, 205, 34, 0.3)",
+            borderRadius: "8px",
+            display: "flex",
           }}
         >
           <span
             style={{
-              fontSize: '24px',
-              color: '#85CD22',
-              fontFamily: 'monospace',
+              fontSize: "24px",
+              color: "#85CD22",
+              fontFamily: "monospace",
             }}
           >
             brew install --cask arc spotify vscode figma
@@ -109,5 +109,5 @@ export default async function Image() {
     {
       ...size,
     },
-  )
+  );
 }

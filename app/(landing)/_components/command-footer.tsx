@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { CheckIcon, CopyIcon } from '@phosphor-icons/react'
+import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
 
-import { Button } from '@/app/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Button } from "@/app/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface CommandFooterProps {
-  brewCommand: string
-  selectedCount: number
-  copied: boolean
-  onCopy: () => void
+  brewCommand: string;
+  selectedCount: number;
+  copied: boolean;
+  onCopy: () => void;
 }
 
 export function CommandFooter({
@@ -24,12 +24,12 @@ export function CommandFooter({
         <div className="flex items-stretch gap-2">
           <div
             className={cn(
-              'flex flex-1 items-center overflow-x-auto border border-border bg-card px-3 font-mono text-xs',
-              !brewCommand && 'text-muted-foreground',
+              "flex flex-1 items-center overflow-x-auto border border-border bg-card px-3 font-mono text-xs",
+              !brewCommand && "text-muted-foreground",
             )}
           >
             <code className="whitespace-nowrap">
-              {brewCommand || '$ brew install --cask ...'}
+              {brewCommand || "$ brew install --cask ..."}
             </code>
           </div>
           <Button
@@ -52,10 +52,10 @@ export function CommandFooter({
         </div>
         <p className="mt-2 font-mono text-[10px] text-muted-foreground">
           {selectedCount > 0
-            ? `${selectedCount} app${selectedCount !== 1 ? 's' : ''} selected`
-            : 'Select apps to generate brew install command'}
+            ? `${selectedCount} app${selectedCount !== 1 ? "s" : ""} selected`
+            : "Select apps to generate brew install command"}
         </p>
       </div>
     </footer>
-  )
+  );
 }

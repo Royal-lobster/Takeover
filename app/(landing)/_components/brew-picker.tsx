@@ -1,94 +1,96 @@
-'use client'
+"use client";
 
-import Fuse from 'fuse.js'
-import * as React from 'react'
-import type { App, AppCategory } from '@/lib/schema'
-import { generateBrewCommand } from '@/lib/data/apps'
-import { AppCard } from './app-card'
-import { CategoryFilter } from './category-filter'
-import { CategorySection } from './category-section'
-import { CommandFooter } from './command-footer'
-import { Header } from './header'
+import Fuse from "fuse.js";
+import * as React from "react";
+import type { App, AppCategory } from "@/lib/schema";
+import { generateBrewCommand } from "@/lib/data/apps";
+import { AppCard } from "./app-card";
+import { CategoryFilter } from "./category-filter";
+import { CategorySection } from "./category-section";
+import { CommandFooter } from "./command-footer";
+import { Header } from "./header";
 
 interface BrewPickerProps {
-  apps: Array<App>
-  categories: Array<{ id: AppCategory; label: string }>
+  apps: Array<App>;
+  categories: Array<{ id: AppCategory; label: string }>;
 }
 
 export function BrewPicker({ apps, categories }: BrewPickerProps) {
-  const [selectedApps, setSelectedApps] = React.useState<Set<string>>(new Set())
+  const [selectedApps, setSelectedApps] = React.useState<Set<string>>(
+    new Set(),
+  );
   const [selectedCategory, setSelectedCategory] = React.useState<
-    AppCategory | 'all'
-  >('all')
-  const [searchQuery, setSearchQuery] = React.useState('')
-  const [copied, setCopied] = React.useState(false)
+    AppCategory | "all"
+  >("all");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [copied, setCopied] = React.useState(false);
 
   const fuse = React.useMemo(
     () =>
       new Fuse(apps, {
-        keys: ['name', 'description', 'brewName'],
+        keys: ["name", "description", "brewName"],
         threshold: 0.4,
         ignoreLocation: true,
       }),
     [apps],
-  )
+  );
 
   const filteredApps = React.useMemo(() => {
-    let result: Array<App>
+    let result: Array<App>;
 
     if (searchQuery.trim()) {
-      const results = fuse.search(searchQuery.trim())
-      result = results.map((r) => r.item)
+      const results = fuse.search(searchQuery.trim());
+      result = results.map((r) => r.item);
     } else {
-      result = apps
+      result = apps;
     }
 
-    if (selectedCategory !== 'all') {
-      result = result.filter((app) => app.category === selectedCategory)
+    if (selectedCategory !== "all") {
+      result = result.filter((app) => app.category === selectedCategory);
     }
 
-    return result
-  }, [searchQuery, selectedCategory, fuse, apps])
+    return result;
+  }, [searchQuery, selectedCategory, fuse, apps]);
 
   const appsByCategory = React.useMemo(() => {
-    const grouped = new Map<AppCategory, Array<App>>()
+    const grouped = new Map<AppCategory, Array<App>>();
     for (const category of categories) {
       const categoryApps = filteredApps.filter(
         (app) => app.category === category.id,
-      )
+      );
       if (categoryApps.length > 0) {
-        grouped.set(category.id, categoryApps)
+        grouped.set(category.id, categoryApps);
       }
     }
-    return grouped
-  }, [filteredApps, categories])
+    return grouped;
+  }, [filteredApps, categories]);
 
-  const brewCommand = generateBrewCommand(Array.from(selectedApps))
+  const brewCommand = generateBrewCommand(Array.from(selectedApps));
 
   const handleToggle = (appId: string) => {
     setSelectedApps((prev) => {
-      const next = new Set(prev)
+      const next = new Set(prev);
       if (next.has(appId)) {
-        next.delete(appId)
+        next.delete(appId);
       } else {
-        next.add(appId)
+        next.add(appId);
       }
-      return next
-    })
-  }
+      return next;
+    });
+  };
 
   const handleCopy = async () => {
-    if (!brewCommand) return
-    await navigator.clipboard.writeText(brewCommand)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    if (!brewCommand) return;
+    await navigator.clipboard.writeText(brewCommand);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleClearAll = () => {
-    setSelectedApps(new Set())
-  }
+    setSelectedApps(new Set());
+  };
 
-  const showCategorySections = selectedCategory === 'all'
+  const showCategorySections = selectedCategory === "all";
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -152,5 +154,5 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
         onCopy={handleCopy}
       />
     </div>
-  )
+  );
 }

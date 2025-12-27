@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import type { App, AppCategory } from '@/lib/schema'
-import { AppCard } from './app-card'
+import type { App, AppCategory } from "@/lib/schema";
+import { AppCard } from "./app-card";
 
 interface CategorySectionProps {
-  categoryId: AppCategory
-  apps: Array<App>
-  categories: Array<{ id: AppCategory; label: string }>
-  selectedApps: Set<string>
-  onToggle: (appId: string) => void
+  categoryId: AppCategory;
+  apps: Array<App>;
+  categories: Array<{ id: AppCategory; label: string }>;
+  selectedApps: Set<string>;
+  onToggle: (appId: string) => void;
 }
 
 export function CategorySection({
@@ -18,8 +18,8 @@ export function CategorySection({
   selectedApps,
   onToggle,
 }: CategorySectionProps) {
-  const category = categories.find((c) => c.id === categoryId)
-  if (!category) return null
+  const category = categories.find((c) => c.id === categoryId);
+  if (!category) return null;
 
   return (
     <section>
@@ -43,5 +43,5 @@ export function CategorySection({
         ))}
       </div>
     </section>
-  )
+  );
 }

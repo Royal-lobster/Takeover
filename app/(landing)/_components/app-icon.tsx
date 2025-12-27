@@ -6,47 +6,47 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface AppIconProps {
-	iconUrl: string;
-	invertInDark?: boolean;
-	size?: "sm" | "md";
-	className?: string;
+  iconUrl: string;
+  invertInDark?: boolean;
+  size?: "sm" | "md";
+  className?: string;
 }
 
 const sizeClasses = {
-	sm: "size-5",
-	md: "size-6",
+  sm: "size-5",
+  md: "size-6",
 } as const;
 
 export function AppIcon({
-	iconUrl,
-	invertInDark,
-	size = "sm",
-	className,
+  iconUrl,
+  invertInDark,
+  size = "sm",
+  className,
 }: AppIconProps) {
-	const [hasError, setHasError] = React.useState(false);
+  const [hasError, setHasError] = React.useState(false);
 
-	const sizeClass = sizeClasses[size];
+  const sizeClass = sizeClasses[size];
 
-	if (hasError) {
-		return (
-			<PackageIcon
-				className={cn(sizeClass, "text-muted-foreground", className)}
-			/>
-		);
-	}
+  if (hasError) {
+    return (
+      <PackageIcon
+        className={cn(sizeClass, "text-muted-foreground", className)}
+      />
+    );
+  }
 
-	return (
-		// biome-ignore lint/performance/noImgElement: Fine here
-		<img
-			src={iconUrl}
-			alt=""
-			className={cn(
-				sizeClass,
-				"object-contain",
-				invertInDark && "dark:invert",
-				className,
-			)}
-			onError={() => setHasError(true)}
-		/>
-	);
+  return (
+    // biome-ignore lint/performance/noImgElement: Fine here
+    <img
+      src={iconUrl}
+      alt=""
+      className={cn(
+        sizeClass,
+        "object-contain",
+        invertInDark && "dark:invert",
+        className,
+      )}
+      onError={() => setHasError(true)}
+    />
+  );
 }

@@ -2,7 +2,7 @@ import {
   QueryClient,
   defaultShouldDehydrateQuery,
   isServer,
-} from '@tanstack/react-query'
+} from "@tanstack/react-query";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -16,20 +16,20 @@ function makeQueryClient() {
       dehydrate: {
         shouldDehydrateQuery: (query) =>
           defaultShouldDehydrateQuery(query) ||
-          query.state.status === 'pending',
+          query.state.status === "pending",
       },
     },
-  })
+  });
 }
 
-let browserQueryClient: QueryClient | undefined = undefined
+let browserQueryClient: QueryClient | undefined = undefined;
 
 export function getQueryClient() {
   if (isServer) {
-    return makeQueryClient()
+    return makeQueryClient();
   }
   if (!browserQueryClient) {
-    browserQueryClient = makeQueryClient()
+    browserQueryClient = makeQueryClient();
   }
-  return browserQueryClient
+  return browserQueryClient;
 }

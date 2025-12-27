@@ -1,28 +1,28 @@
-'use client'
+"use client";
 
-import { Info } from '@phosphor-icons/react'
-import type * as React from 'react'
-import type { App } from '@/lib/schema'
-import { Badge } from '@/app/components/ui/badge'
-import { Button } from '@/app/components/ui/button'
+import { Info } from "@phosphor-icons/react";
+import type * as React from "react";
+import type { App } from "@/lib/schema";
+import { Badge } from "@/app/components/ui/badge";
+import { Button } from "@/app/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/app/components/ui/popover'
-import type { HomebrewInfo } from '@/lib/api/homebrew'
-import { AppIcon } from './app-icon'
+} from "@/app/components/ui/popover";
+import type { HomebrewInfo } from "@/lib/api/homebrew";
+import { AppIcon } from "./app-icon";
 
 interface AppInfoPopoverProps {
-  app: App
-  brewInfo: HomebrewInfo | undefined
-  isLoading: boolean
-  error: Error | null
-  onTrigger: () => void
+  app: App;
+  brewInfo: HomebrewInfo | undefined;
+  isLoading: boolean;
+  error: Error | null;
+  onTrigger: () => void;
 }
 
 function getHomebrewUrl(brewInfo: HomebrewInfo | undefined, brewName: string) {
-  return brewInfo?.url ?? `https://formulae.brew.sh/cask/${brewName}`
+  return brewInfo?.url ?? `https://formulae.brew.sh/cask/${brewName}`;
 }
 
 function getDescription(
@@ -30,14 +30,14 @@ function getDescription(
   fallback: string,
   error: Error | null,
 ) {
-  if (error) return 'Could not load Homebrew details'
-  const desc = (brewInfo?.description ?? '').trim()
-  return desc || fallback || 'No description available yet.'
+  if (error) return "Could not load Homebrew details";
+  const desc = (brewInfo?.description ?? "").trim();
+  return desc || fallback || "No description available yet.";
 }
 
 function getBrewCommand(brewInfo: HomebrewInfo | undefined, brewName: string) {
-  const caskFlag = brewInfo?.kind === 'cask' ? '--cask ' : ''
-  return `brew install ${caskFlag}${brewName}`
+  const caskFlag = brewInfo?.kind === "cask" ? "--cask " : "";
+  return `brew install ${caskFlag}${brewName}`;
 }
 
 export function AppInfoPopover({
@@ -47,14 +47,14 @@ export function AppInfoPopover({
   error,
   onTrigger,
 }: AppInfoPopoverProps) {
-  const homebrewUrl = getHomebrewUrl(brewInfo, app.brewName)
-  const description = getDescription(brewInfo, app.description, error)
-  const brewCommand = getBrewCommand(brewInfo, app.brewName)
+  const homebrewUrl = getHomebrewUrl(brewInfo, app.brewName);
+  const description = getDescription(brewInfo, app.description, error);
+  const brewCommand = getBrewCommand(brewInfo, app.brewName);
 
   const handleClick = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    onTrigger()
-  }
+    event.stopPropagation();
+    onTrigger();
+  };
 
   return (
     <Popover>
@@ -95,7 +95,7 @@ export function AppInfoPopover({
                 {brewInfo?.name ?? app.name}
               </p>
               <Badge variant="secondary" className="uppercase tracking-wider">
-                {brewInfo?.kind ?? 'brew'}
+                {brewInfo?.kind ?? "brew"}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">{description}</p>
@@ -143,5 +143,5 @@ export function AppInfoPopover({
         </div>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
