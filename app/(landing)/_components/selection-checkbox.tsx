@@ -16,15 +16,11 @@ export function SelectionCheckbox({
 	appId,
 }: SelectionCheckboxProps) {
 	return (
-		<div
-			role="button"
-			tabIndex={0}
-			onClick={() => appId && onToggle?.(appId)}
-			onKeyDown={(e) => {
-				if ((e.key === "Enter" || e.key === " ") && appId) {
-					e.preventDefault();
-					onToggle?.(appId);
-				}
+		<button
+			type="button"
+			onClick={(e) => {
+				e.stopPropagation();
+				appId && onToggle?.(appId);
 			}}
 			className={cn(
 				"flex size-4 shrink-0 items-center justify-center border transition-colors cursor-pointer",
@@ -34,6 +30,6 @@ export function SelectionCheckbox({
 			)}
 		>
 			{isSelected && <CheckIcon className="size-2.5" weight="bold" />}
-		</div>
+		</button>
 	);
 }

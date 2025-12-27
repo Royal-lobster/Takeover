@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Fine here */
+
 "use client";
 
 import * as React from "react";
@@ -28,7 +30,15 @@ export function AppCard({ app, isSelected, onToggle }: AppCardProps) {
 	}, []);
 
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: Fine here
 		<div
+			onClick={(e) => {
+				// Prevent toggle if clicking on interactive elements
+				if ((e.target as HTMLElement).closest('button, a, [role="button"]')) {
+					return;
+				}
+				onToggle(app.id);
+			}}
 			className={cn(
 				"group flex cursor-pointer select-none items-center gap-2.5 border px-2.5 py-2 text-left transition-colors",
 				"hover:bg-muted/50",
