@@ -66,7 +66,6 @@ export async function fetchHomebrewInfo(
 				kind: endpoint.kind,
 			};
 		} catch {
-			continue;
 		}
 	}
 

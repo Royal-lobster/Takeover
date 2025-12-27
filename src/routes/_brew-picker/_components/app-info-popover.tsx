@@ -1,5 +1,5 @@
 import { Info } from "@phosphor-icons/react";
-import * as React from "react";
+import type * as React from "react";
 
 import { AppIcon } from "./app-icon";
 import type { HomebrewInfo } from "@/lib/api/homebrew";
