@@ -1,8 +1,5 @@
 import { Info } from "@phosphor-icons/react";
 import type * as React from "react";
-
-import { AppIcon } from "./app-icon";
-import type { HomebrewInfo } from "@/lib/api/homebrew";
 import type { App } from "@/_schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +8,8 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import type { HomebrewInfo } from "@/lib/api/homebrew";
+import { AppIcon } from "./app-icon";
 
 interface AppInfoPopoverProps {
 	app: App;
@@ -99,7 +98,10 @@ export function AppInfoPopover({
 						</div>
 						<p className="text-xs text-muted-foreground">{description}</p>
 						<div className="flex flex-wrap items-center gap-2">
-							<Badge variant="outline" className="max-w-full truncate font-mono">
+							<Badge
+								variant="outline"
+								className="max-w-full truncate font-mono"
+							>
 								{brewCommand}
 							</Badge>
 							{brewInfo?.version && (
