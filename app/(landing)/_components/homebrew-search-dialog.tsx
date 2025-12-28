@@ -57,14 +57,14 @@ export function HomebrewSearchDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg sm:max-w-2xl">
+      <DialogContent className="overflow-hidden p-0 shadow-lg sm:max-w-2xl!">
         <DialogTitle className="sr-only">Search Homebrew Catalogue</DialogTitle>
         <DialogDescription className="sr-only">
           Search over 10,000+ formulae and casks from the official Homebrew
           repository.
         </DialogDescription>
         <Command shouldFilter={false} className="h-full">
-          <div className="relative border-b border-border">
+          <div className="relative">
             <CommandInput
               placeholder="Search Homebrew catalogue..."
               value={query}
@@ -171,6 +171,14 @@ function SearchResultItem({
           >
             {pkg.type}
           </Badge>
+          {pkg.version && (
+            <Badge
+              variant="outline"
+              className="shrink-0 font-mono text-[10px] text-muted-foreground"
+            >
+              v{pkg.version}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <p className="truncate text-xs text-muted-foreground group-data-[selected=true]:text-muted-foreground">
