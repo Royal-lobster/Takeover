@@ -21,6 +21,7 @@
 
 - 🎯 **Curated App Collection** - Browse 200+ popular macOS applications across 11 categories
 - 🔍 **Smart Search** - Quickly find apps with fuzzy search
+- 🍺 **Homebrew Catalogue Search** - Can't find an app in our collection? Search through 10,000+ formulae and casks from the official Homebrew repository directly within the app
 - 🎨 **Beautiful UI** - Built with shadcn/ui and Tailwind CSS 4
 - 📦 **One-Click Install** - Generate Homebrew commands to install multiple apps at once
 - 🌓 **Dark Mode** - Automatic dark mode support with icon inversion
@@ -80,23 +81,44 @@ pnpm dev
 installkit/
 ├── app/
 │   ├── (landing)/           # Landing page with app picker
-│   │   ├── _components/     # Landing page components
-│   │   └── page.tsx
+│   │   ├── _actions.ts      # Server actions (Homebrew search)
+│   │   ├── page.tsx
+│   │   └── _components/     # Landing page components
+│   │       ├── app-card.tsx
+│   │       ├── app-icon.tsx
+│   │       ├── app-info-popover.tsx
+│   │       ├── brew-picker.tsx
+│   │       ├── catalogue-search-cta.tsx
+│   │       ├── category-filter.tsx
+│   │       ├── category-section.tsx
+│   │       ├── command-footer.tsx
+│   │       ├── custom-package-card.tsx
+│   │       ├── header.tsx
+│   │       ├── homebrew-search-dialog.tsx
+│   │       ├── selection-checkbox.tsx
+│   │       └── _hooks/      # Custom hooks
+│   │           ├── use-homebrew-info.ts
+│   │           └── use-homebrew-search.ts
 │   ├── (layout)/            # Layout components
+│   │   └── providers.tsx
 │   ├── components/ui/       # Reusable UI components (shadcn)
 │   ├── globals.css          # Global styles
-│   └── layout.tsx           # Root layout
+│   ├── layout.tsx           # Root layout
+│   └── opengraph-image.tsx  # OG image generation
 ├── lib/
-│   ├── api/                 # API clients (Homebrew API)
+│   ├── api/                 # API clients
+│   │   ├── axios.ts
+│   │   └── homebrew.ts      # Homebrew API integration
 │   ├── data/
-│   │   └── apps.ts         # App data source (200+ apps)
-│   ├── helpers/            # Helper functions
-│   └── schema.ts           # Zod schemas and types
+│   │   └── apps.ts          # App data source (200+ apps)
+│   ├── helpers/
+│   │   └── icons.ts         # Icon helper functions
+│   ├── get-query-client.ts  # TanStack Query setup
+│   ├── schema.ts            # Zod schemas and types
+│   └── utils.ts             # Utility functions
 ├── public/                  # Static assets
-├── scripts/                 # Utility scripts
-│   ├── detect-dark-icons.mjs     # Icon analysis
-│   ├── fix-icons.mjs            # Icon fixes
-│   └── verify-homebrew-packages.mjs  # Package verification
+│   ├── manifest.json
+│   └── robots.txt
 └── package.json
 ```
 
