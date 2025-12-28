@@ -29,18 +29,18 @@ export function CommandFooter({
   const commandLabel = isUninstallMode ? "uninstall" : "install";
 
   return (
-    <footer className="fixed inset-x-0 bottom-0 border-t border-border bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-3">
-        <div className="flex items-stretch gap-2">
+    <footer className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto max-w-6xl px-4 py-4">
+        <div className="flex items-stretch gap-3">
           <Toggle
             pressed={isUninstallMode}
             onPressedChange={onToggleMode}
             variant="outline"
             size="lg"
             className={cn(
-              "shrink-0 h-auto! min-w-max~ px-3 py-2.5",
+              "shrink-0 h-auto px-3 py-2.5",
               isUninstallMode &&
-                "bg-destructive! text-destructive-foreground! border-destructive! !hover:bg-destructive/90",
+                "bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground",
             )}
             aria-label="Toggle uninstall mode"
           >
@@ -48,7 +48,7 @@ export function CommandFooter({
           </Toggle>
           <div
             className={cn(
-              "flex flex-1 items-center overflow-x-auto border border-border bg-card px-3 font-mono text-xs",
+              "flex flex-1 items-center overflow-x-auto rounded-md border border-input bg-secondary/50 px-4 font-mono text-xs transition-colors scrollbar-hide",
               !displayCommand && "text-muted-foreground",
             )}
           >
@@ -61,7 +61,7 @@ export function CommandFooter({
           <Button
             onClick={onCopy}
             disabled={!displayCommand}
-            className="h-auto shrink-0 gap-1.5 px-4 py-2.5 font-mono text-xs"
+            className="h-auto shrink-0 gap-2 px-5 py-2.5 font-mono text-xs shadow-sm transition-all active:scale-95"
           >
             {copied ? (
               <>
@@ -76,7 +76,7 @@ export function CommandFooter({
             )}
           </Button>
         </div>
-        <p className="mt-2 font-mono text-[10px] text-muted-foreground">
+        <p className="mt-2.5 text-center font-mono text-[10px] text-muted-foreground/80 sm:text-left">
           {selectedCount > 0
             ? `${selectedCount} app${selectedCount !== 1 ? "s" : ""} selected • ${isUninstallMode ? "Uninstall" : "Install"} mode`
             : `Select apps to generate brew ${commandLabel} command`}

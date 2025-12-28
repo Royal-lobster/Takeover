@@ -1,7 +1,7 @@
 "use client";
 
-import type { AppCategory } from "@/lib/schema";
 import { ToggleGroup, ToggleGroupItem } from "@/app/components/ui/toggle-group";
+import type { AppCategory } from "@/lib/schema";
 
 interface CategoryFilterProps {
   categories: Array<{ id: AppCategory; label: string }>;
@@ -24,11 +24,11 @@ export function CategoryFilter({
         }
       }}
       spacing={1}
-      className="flex-wrap"
+      className="w-full justify-start overflow-x-auto no-scrollbar sm:flex-wrap sm:overflow-visible"
     >
       <ToggleGroupItem
         value="all"
-        className="px-2.5 py-1 font-mono text-[11px]"
+        className="px-2.5 py-1 font-mono text-[11px] whitespace-nowrap"
       >
         All
       </ToggleGroupItem>
@@ -36,7 +36,7 @@ export function CategoryFilter({
         <ToggleGroupItem
           key={category.id}
           value={category.id}
-          className="px-2.5 py-1 font-mono text-[11px]"
+          className="px-2.5 py-1 font-mono text-[11px] whitespace-nowrap"
         >
           {category.label}
         </ToggleGroupItem>

@@ -24,7 +24,7 @@ export function Header({
   onSearchChange,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-10 border-b border-border bg-background">
+    <header className="border-b border-border bg-background">
       <div className="mx-auto max-w-6xl px-4 py-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-2">

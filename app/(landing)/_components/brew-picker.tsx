@@ -14,8 +14,8 @@ import { CatalogueSearchCTA } from "./catalogue-search-cta";
 import { CategoryFilter } from "./category-filter";
 import { CategorySection } from "./category-section";
 import { CommandFooter } from "./command-footer";
-import { Header } from "./header";
 import { CustomPackagesSection } from "./custom-package-card";
+import { Header } from "./header";
 import { HomebrewSearchDialog } from "./homebrew-search-dialog";
 
 interface BrewPickerProps {
@@ -217,22 +217,27 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <Header
-        selectedCount={selectedCount}
-        onClearAll={handleClearAll}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <Header
+          selectedCount={selectedCount}
+          onClearAll={handleClearAll}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+        <div className="border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 py-2">
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
+          </div>
+        </div>
+      </div>
 
       <main className="flex-1 pb-24">
         <div className="mx-auto max-w-6xl px-4 py-4">
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-
-          <div className="mt-6">
+          <div className="mt-2">
             {filteredApps.length > 0 ? (
               showCategorySections ? (
                 <div className="space-y-8">
