@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["@phosphor-icons/react"],
+    useCache: true,
   },
 };
 
