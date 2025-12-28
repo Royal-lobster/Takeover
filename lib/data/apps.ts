@@ -149,7 +149,7 @@ const DEVELOPMENT_APPS: Array<App> = [
     brewName: "kitty",
     category: AppCategoryEnum.enum.development,
     description: "Fast, feature-rich GPU terminal",
-    iconUrl: favicon("sw.kovidgoyal.net"),
+    iconUrl: simpleIcon("gnometerminal"),
     isCask: true,
   },
   {
@@ -376,7 +376,7 @@ const PRODUCTIVITY_APPS: Array<App> = [
     brewName: "logseq",
     category: AppCategoryEnum.enum.productivity,
     description: "Privacy-first outliner and knowledge base",
-    iconUrl: favicon("logseq.com"),
+    iconUrl: simpleIcon("logseq"),
     isCask: true,
   },
   {
@@ -643,7 +643,7 @@ const COMMUNICATION_APPS: Array<App> = [
     brewName: "mailspring",
     category: AppCategoryEnum.enum.communication,
     description: "Beautiful email client",
-    iconUrl: favicon("getmailspring.com"),
+    iconUrl: simpleIcon("maildotru"),
     isCask: true,
   },
   {
@@ -652,7 +652,7 @@ const COMMUNICATION_APPS: Array<App> = [
     brewName: "spark",
     category: AppCategoryEnum.enum.communication,
     description: "Smart email client by Readdle",
-    iconUrl: favicon("www.shadowlab.org"),
+    iconUrl: favicon("sparkmailapp.com"),
     isCask: false,
   },
 ];
@@ -806,7 +806,7 @@ const UTILITY_APPS: Array<App> = [
     brewName: "appcleaner",
     category: AppCategoryEnum.enum.utilities,
     description: "Thoroughly uninstall apps",
-    iconUrl: favicon("freemacsoft.net"),
+    iconUrl: favicon("appcleaner.macupdate.com"),
     isCask: true,
   },
   {
@@ -833,7 +833,7 @@ const UTILITY_APPS: Array<App> = [
     brewName: "stats",
     category: AppCategoryEnum.enum.utilities,
     description: "System monitor in your menu bar",
-    iconUrl: favicon("exelban.github.io"),
+    iconUrl: favicon("mac-stats.com"),
     isCask: true,
   },
   {
@@ -896,8 +896,9 @@ const UTILITY_APPS: Array<App> = [
     brewName: "monitorcontrol",
     category: AppCategoryEnum.enum.utilities,
     description: "Control external display brightness",
-    iconUrl: favicon("monitorcontrol.app"),
+    iconUrl: simpleIcon("github"),
     isCask: true,
+    invertInDark: true,
   },
   {
     id: "lunar",
@@ -923,8 +924,9 @@ const UTILITY_APPS: Array<App> = [
     brewName: "coconutbattery",
     category: AppCategoryEnum.enum.utilities,
     description: "Battery health monitor",
-    iconUrl: favicon("www.coconut-flavour.com"),
+    iconUrl: simpleIcon("apple"),
     isCask: true,
+    invertInDark: true,
   },
   {
     id: "suspicious-package",
@@ -1197,7 +1199,7 @@ const CLI_APPS: Array<App> = [
     brewName: "jq",
     category: AppCategoryEnum.enum.cli,
     description: "JSON query and transformation tool",
-    iconUrl: favicon("jqlang.github.io"),
+    iconUrl: simpleIcon("json"),
     isCask: false,
   },
   {
@@ -1741,7 +1743,7 @@ const DESIGN_APPS: Array<App> = [
     brewName: "principle",
     category: AppCategoryEnum.enum.design,
     description: "Animation and prototyping tool",
-    iconUrl: favicon("principleformac.com"),
+    iconUrl: simpleIcon("framer"),
     isCask: true,
   },
   {
@@ -1810,6 +1812,32 @@ export function generateBrewCommand(appIds: Array<string>): string {
   if (formulaApps.length > 0) {
     const formulaNames = formulaApps.map((app) => app.brewName).join(" ");
     commands.push(`brew install ${formulaNames}`);
+  }
+
+  return commands.join(" && ");
+}
+
+export function generateUninstallCommand(appIds: Array<string>): string {
+  if (appIds.length === 0) return "";
+
+  const apps = appIds
+    .map((id) => APPS.find((app) => app.id === id))
+    .filter((app): app is App => app !== undefined);
+
+  // Separate cask apps from formula apps based on isCask property
+  const caskApps = apps.filter((app) => app.isCask);
+  const formulaApps = apps.filter((app) => !app.isCask);
+
+  const commands: string[] = [];
+
+  if (caskApps.length > 0) {
+    const caskNames = caskApps.map((app) => app.brewName).join(" ");
+    commands.push(`brew uninstall --cask ${caskNames}`);
+  }
+
+  if (formulaApps.length > 0) {
+    const formulaNames = formulaApps.map((app) => app.brewName).join(" ");
+    commands.push(`brew uninstall ${formulaNames}`);
   }
 
   return commands.join(" && ");

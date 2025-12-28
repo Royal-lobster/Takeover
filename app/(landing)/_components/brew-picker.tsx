@@ -2,8 +2,8 @@
 
 import Fuse from "fuse.js";
 import * as React from "react";
+import { generateBrewCommand, generateUninstallCommand } from "@/lib/data/apps";
 import type { App, AppCategory } from "@/lib/schema";
-import { generateBrewCommand } from "@/lib/data/apps";
 import { AppCard } from "./app-card";
 import { CategoryFilter } from "./category-filter";
 import { CategorySection } from "./category-section";
@@ -24,6 +24,7 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
   >("all");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [copied, setCopied] = React.useState(false);
+  const [isUninstallMode, setIsUninstallMode] = React.useState(false);
 
   const fuse = React.useMemo(
     () =>
@@ -66,6 +67,7 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
   }, [filteredApps, categories]);
 
   const brewCommand = generateBrewCommand(Array.from(selectedApps));
+  const uninstallCommand = generateUninstallCommand(Array.from(selectedApps));
 
   const handleToggle = (appId: string) => {
     setSelectedApps((prev) => {
@@ -80,14 +82,19 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
   };
 
   const handleCopy = async () => {
-    if (!brewCommand) return;
-    await navigator.clipboard.writeText(brewCommand);
+    const command = isUninstallMode ? uninstallCommand : brewCommand;
+    if (!command) return;
+    await navigator.clipboard.writeText(command);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleClearAll = () => {
     setSelectedApps(new Set());
+  };
+
+  const handleToggleMode = () => {
+    setIsUninstallMode((prev) => !prev);
   };
 
   const showCategorySections = selectedCategory === "all";
@@ -149,9 +156,12 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
 
       <CommandFooter
         brewCommand={brewCommand}
+        uninstallCommand={uninstallCommand}
         selectedCount={selectedApps.size}
         copied={copied}
+        isUninstallMode={isUninstallMode}
         onCopy={handleCopy}
+        onToggleMode={handleToggleMode}
       />
     </div>
   );
