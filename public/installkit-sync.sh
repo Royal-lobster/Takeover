@@ -161,23 +161,27 @@ generate_short() {
 # -----------------------------------------------------------------------------
 # multiselect_menu - Interactive checkbox menu for package selection
 # Args:
-#   $1 = comma-separated list of options
-#   $2 = name of variable to store result (comma-separated selected items)
-#   $3 = page size (default: 15)
+#   $1 = comma-separated list of package names
+#   $2 = comma-separated list of package types (cask/formula)
+#   $3 = name of variable to store result (comma-separated selected values)
+#   $4 = page size (default: 15)
 # Returns: 0 on confirm, 1 on quit/cancel
 # Note: Bash 3.2 compatible (no associative arrays)
 # -----------------------------------------------------------------------------
 multiselect_menu() {
-    local options_str="$1"
-    local result_var="$2"
-    local page_size="${3:-15}"
+    local packages_str="$1"
+    local types_str="$2"
+    local result_var="$3"
+    local page_size="${4:-15}"
 
-    local options=()
+    local packages=()
+    local types=()
     local IFS_BACKUP="$IFS"
-    IFS=',' read -ra options <<< "$options_str"
+    IFS=',' read -ra packages <<< "$packages_str"
+    IFS=',' read -ra types <<< "$types_str"
     IFS="$IFS_BACKUP"
 
-    local num_options=${#options[@]}
+    local num_options=${#packages[@]}
 
     local selected=()
     local i
@@ -193,8 +197,21 @@ multiselect_menu() {
     fi
 
     if [ ! -r /dev/tty ]; then
-        eval "$result_var='$options_str'"
+        eval "$result_var='$packages_str'"
         return 0
+    fi
+
+    local max_name_len=0
+    for ((i=0; i<num_options; i++)); do
+        local len=${#packages[$i]}
+        if [ $len -gt $max_name_len ]; then
+            max_name_len=$len
+        fi
+    done
+
+    local col_width=$((max_name_len + 12))
+    if [ $col_width -lt 40 ]; then
+        col_width=40
     fi
 
     printf "\033[?25l"
@@ -236,10 +253,26 @@ multiselect_menu() {
                 printf "[ ] "
             fi
 
-            if [ $idx -eq $cursor ]; then
-                printf "${REVERSE}${options[$idx]}${RESET}\n"
+            local pkg_name="${packages[$idx]}"
+            local pkg_type="${types[$idx]}"
+            local name_len=${#pkg_name}
+            local padding=$((col_width - name_len - 4))
+
+            local type_color
+            if [ "$pkg_type" = "cask" ]; then
+                type_color="${DIM}${CYAN}"
             else
-                printf "${options[$idx]}\n"
+                type_color="${DIM}${YELLOW}"
+            fi
+
+            if [ $idx -eq $cursor ]; then
+                printf "${REVERSE}%s${RESET}" "$pkg_name"
+                printf "%*s" "$padding" ""
+                printf "${type_color}%s${NC}\n" "$pkg_type"
+            else
+                printf "%s" "$pkg_name"
+                printf "%*s" "$padding" ""
+                printf "${type_color}%s${NC}\n" "$pkg_type"
             fi
         done
 
@@ -319,9 +352,9 @@ multiselect_menu() {
                     for ((i=0; i<num_options; i++)); do
                         if [ "${selected[$i]}" = "true" ]; then
                             if [ -n "$result" ]; then
-                                result="$result,${options[$i]}"
+                                result="$result,${packages[$i]}"
                             else
-                                result="${options[$i]}"
+                                result="${packages[$i]}"
                             fi
                         fi
                     done
@@ -386,14 +419,22 @@ CASKS=$(brew list --cask 2>/dev/null | tr '\n' ',' | sed 's/,$//')
 FORMULAE=$(brew list --formula 2>/dev/null | tr '\n' ',' | sed 's/,$//')
 
 ALL_PACKAGES=""
+ALL_TYPES=""
 if [ -n "$CASKS" ]; then
     ALL_PACKAGES="$CASKS"
+    CASK_COUNT_FOR_TYPES=$(echo "$CASKS" | tr ',' '\n' | wc -l | tr -d ' ')
+    CASK_TYPES=$(printf 'cask,%.0s' $(seq 1 $CASK_COUNT_FOR_TYPES) | sed 's/,$//')
+    ALL_TYPES="$CASK_TYPES"
 fi
 if [ -n "$FORMULAE" ]; then
+    FORMULA_COUNT_FOR_TYPES=$(echo "$FORMULAE" | tr ',' '\n' | wc -l | tr -d ' ')
+    FORMULA_TYPES=$(printf 'formula,%.0s' $(seq 1 $FORMULA_COUNT_FOR_TYPES) | sed 's/,$//')
     if [ -n "$ALL_PACKAGES" ]; then
         ALL_PACKAGES="$ALL_PACKAGES,$FORMULAE"
+        ALL_TYPES="$ALL_TYPES,$FORMULA_TYPES"
     else
         ALL_PACKAGES="$FORMULAE"
+        ALL_TYPES="$FORMULA_TYPES"
     fi
 fi
 
@@ -428,7 +469,7 @@ echo
 SELECTED_PACKAGES="$ALL_PACKAGES"
 
 if [ "$SKIP_SELECTION" = false ] && [ -r /dev/tty ]; then
-    if multiselect_menu "$ALL_PACKAGES" SELECTED_PACKAGES 15; then
+    if multiselect_menu "$ALL_PACKAGES" "$ALL_TYPES" SELECTED_PACKAGES 15; then
         if [ -z "$SELECTED_PACKAGES" ]; then
             echo -e "${YELLOW}⚠️  No packages selected${NC}"
             exit 0
