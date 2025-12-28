@@ -979,6 +979,7 @@ const UTILITY_APPS: Array<App> = [
     description: "Mount cloud storage as disk",
     iconUrl: favicon("mountainduck.io"),
     isCask: true,
+    invertInDark: true,
   },
 ];
 
@@ -1139,6 +1140,7 @@ const CLI_APPS: Array<App> = [
     description: "Fast recursive search tool (rg)",
     iconUrl: simpleIcon("rust"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "fd",
@@ -1148,6 +1150,7 @@ const CLI_APPS: Array<App> = [
     description: "Fast alternative to find",
     iconUrl: simpleIcon("rust"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "exa",
@@ -1157,6 +1160,7 @@ const CLI_APPS: Array<App> = [
     description: "Modern ls replacement with git integration",
     iconUrl: simpleIcon("rust"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "bat",
@@ -1166,6 +1170,7 @@ const CLI_APPS: Array<App> = [
     description: "Cat clone with syntax highlighting",
     iconUrl: simpleIcon("rust"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "zoxide",
@@ -1175,6 +1180,7 @@ const CLI_APPS: Array<App> = [
     description: "Smarter cd command with directory jumping",
     iconUrl: simpleIcon("rust"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "tldr",
@@ -1391,6 +1397,7 @@ const LANGUAGES_APPS: Array<App> = [
     description: "Java programming language",
     iconUrl: simpleIcon("openjdk"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "php",
@@ -1532,6 +1539,7 @@ const PACKAGE_MANAGERS_APPS: Array<App> = [
     description: "Rust package manager",
     iconUrl: simpleIcon("rust"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "gems",
@@ -1586,6 +1594,7 @@ const PACKAGE_MANAGERS_APPS: Array<App> = [
     description: "Rust toolchain installer",
     iconUrl: simpleIcon("rust"),
     isCask: false,
+    invertInDark: true,
   },
   {
     id: "jenv",
