@@ -2,7 +2,6 @@
 
 import { Info } from "@phosphor-icons/react";
 import type * as React from "react";
-import type { App } from "@/lib/schema";
 import { Badge } from "@/app/components/ui/badge";
 import { Button } from "@/app/components/ui/button";
 import {
@@ -11,6 +10,7 @@ import {
   PopoverTrigger,
 } from "@/app/components/ui/popover";
 import type { HomebrewInfo } from "@/lib/api/homebrew";
+import type { App } from "@/lib/schema";
 import { AppIcon } from "./app-icon";
 
 interface AppInfoPopoverProps {
