@@ -101,11 +101,11 @@ installkit/
 ### Available Scripts
 
 ```bash
-pnpm dev          # Start development server with Turbopack
+pnpm dev          # Start development server
 pnpm build        # Build for production
 pnpm start        # Start production server
-pnpm lint         # Run ESLint
-pnpm format       # Format code with Prettier
+pnpm lint         # Run Biome
+pnpm format       # Format code with Biome
 ```
 
 ### Adding New Apps
