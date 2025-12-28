@@ -1,6 +1,11 @@
 "use client";
 
-import { CheckIcon, CopyIcon, TrashIcon } from "@phosphor-icons/react";
+import {
+  CheckIcon,
+  CopyIcon,
+  ShareNetworkIcon,
+  TrashIcon,
+} from "@phosphor-icons/react";
 
 import { Button } from "@/app/components/ui/button";
 import { Toggle } from "@/app/components/ui/toggle";
@@ -14,6 +19,7 @@ interface CommandFooterProps {
   isUninstallMode: boolean;
   onCopy: () => void;
   onToggleMode: () => void;
+  onShare?: () => void;
 }
 
 export function CommandFooter({
@@ -24,6 +30,7 @@ export function CommandFooter({
   isUninstallMode,
   onCopy,
   onToggleMode,
+  onShare,
 }: CommandFooterProps) {
   const displayCommand = isUninstallMode ? uninstallCommand : brewCommand;
   const commandLabel = isUninstallMode ? "uninstall" : "install";
@@ -75,6 +82,17 @@ export function CommandFooter({
               </>
             )}
           </Button>
+          {onShare && (
+            <Button
+              onClick={onShare}
+              disabled={!displayCommand}
+              variant="outline"
+              size="lg"
+              className="h-auto shrink-0  px-3 py-2.5 shadow-sm transition-all active:scale-95"
+            >
+              <ShareNetworkIcon className="size-4" />
+            </Button>
+          )}
         </div>
         <p className="mt-2.5 text-center font-mono text-[10px] text-muted-foreground/80 sm:text-left">
           {selectedCount > 0

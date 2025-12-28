@@ -17,10 +17,15 @@ import { CommandFooter } from "./command-footer";
 import { CustomPackagesSection } from "./custom-package-card";
 import { Header } from "./header";
 import { HomebrewSearchDialog } from "./homebrew-search-dialog";
+import { ShareDialog } from "./share-dialog";
 
 interface BrewPickerProps {
   apps: Array<App>;
   categories: Array<{ id: AppCategory; label: string }>;
+  kitName?: string;
+  kitDescription?: string;
+  initialSelectedAppIds?: string[];
+  initialCustomPackages?: Array<{ token: string; name: string }>;
 }
 
 type CustomPackage = {
@@ -64,13 +69,27 @@ function generateCommandWithCustom(
   return allCommands.join(" && ");
 }
 
-export function BrewPicker({ apps, categories }: BrewPickerProps) {
+export function BrewPicker({
+  apps,
+  categories,
+  kitName,
+  kitDescription,
+  initialSelectedAppIds = [],
+  initialCustomPackages = [],
+}: BrewPickerProps) {
   const [selectedApps, setSelectedApps] = React.useState<Set<string>>(
-    new Set(),
+    new Set(initialSelectedAppIds),
   );
   const [customPackages, setCustomPackages] = React.useState<
     Map<string, CustomPackage>
-  >(new Map());
+  >(
+    new Map(
+      initialCustomPackages.map((pkg) => [
+        pkg.token,
+        { ...pkg, type: "cask" as const },
+      ]),
+    ),
+  );
   const [selectedCategory, setSelectedCategory] = React.useState<
     AppCategory | "all"
   >("all");
@@ -78,6 +97,7 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
   const [copied, setCopied] = React.useState(false);
   const [isUninstallMode, setIsUninstallMode] = React.useState(false);
   const [isSearchDialogOpen, setIsSearchDialogOpen] = React.useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = React.useState(false);
 
   const fuse = React.useMemo(
     () =>
@@ -213,6 +233,10 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
     });
   }, []);
 
+  const handleShare = () => {
+    setIsShareDialogOpen(true);
+  };
+
   const showCategorySections = selectedCategory === "all";
 
   return (
@@ -237,6 +261,63 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
 
       <main className="flex-1 pb-24">
         <div className="mx-auto max-w-6xl px-4 py-4">
+          {kitName && (
+            <>
+              <div className="mb-12 border-b border-border/40 pb-8 pt-12">
+                <h1 className="text-center text-5xl font-bold tracking-tight sm:text-6xl">
+                  {kitName}
+                </h1>
+                {kitDescription && (
+                  <p className="mx-auto mt-3 max-w-2xl text-center text-base text-muted-foreground">
+                    {kitDescription}
+                  </p>
+                )}
+                <div className="mt-4 text-center text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">
+                    {initialSelectedAppIds.length +
+                      initialCustomPackages.length}{" "}
+                    apps
+                  </span>{" "}
+                  pre-selected for quick installation
+                </div>
+              </div>
+
+              {selectedApps.size > 0 && (
+                <div className="mb-12">
+                  <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {Array.from(selectedApps)
+                      .map((id) => apps.find((app) => app.id === id))
+                      .filter((app): app is App => app !== undefined)
+                      .map((app) => (
+                        <AppCard
+                          key={app.id}
+                          app={app}
+                          isSelected={selectedApps.has(app.id)}
+                          onToggle={handleToggle}
+                        />
+                      ))}
+                  </div>
+                  {customPackages.size > 0 && (
+                    <div className="mt-4">
+                      <CustomPackagesSection
+                        packages={customPackages}
+                        onRemove={handleRemoveCustomPackage}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="my-12 flex items-center gap-4">
+                <div className="h-px flex-1 bg-border" />
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className="font-medium">Browse all apps</span>
+                </div>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+            </>
+          )}
+
           <div className="mt-2">
             {filteredApps.length > 0 ? (
               showCategorySections ? (
@@ -292,6 +373,7 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
         isUninstallMode={isUninstallMode}
         onCopy={handleCopy}
         onToggleMode={handleToggleMode}
+        onShare={handleShare}
       />
 
       <HomebrewSearchDialog
@@ -299,6 +381,13 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
         onOpenChange={setIsSearchDialogOpen}
         onSelectPackage={handleSelectPackage}
         selectedTokens={selectedTokens}
+      />
+
+      <ShareDialog
+        open={isShareDialogOpen}
+        onOpenChange={setIsShareDialogOpen}
+        selectedAppIds={Array.from(selectedApps)}
+        customPackageTokens={Array.from(customPackages.keys())}
       />
     </div>
   );
