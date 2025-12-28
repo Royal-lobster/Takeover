@@ -34,12 +34,28 @@ Browse through curated categories of applications, select the ones you want, and
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### 🍺 Quick Start for Homebrew Users
+
+Already have apps installed with Homebrew? Get your personalized InstallKit URL instantly:
+
+```bash
+# Generate InstallKit URL
+curl -fsSL https://installkit.vercel.app/installkit-sync.sh | bash
+
+# Generate InstallKit URL with short link
+curl -fsSL https://installkit.vercel.app/installkit-sync.sh | bash -s -- --short
+```
+
+This will scan your installed Homebrew packages and generate a shareable InstallKit URL with all your apps pre-selected.
+
+### 🛠️ Development Setup
+
+#### Prerequisites
 
 - Node.js 18+ or Bun
 - pnpm (recommended) or npm/yarn
 
-### Installation
+#### Installation
 
 1. Clone the repository:
 
