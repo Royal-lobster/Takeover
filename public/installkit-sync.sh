@@ -87,43 +87,49 @@ multiselect_menu() {
     local options_str="$1"
     local result_var="$2"
     local page_size="${3:-15}"
-    
+
     local options=()
     local IFS_BACKUP="$IFS"
     IFS=',' read -ra options <<< "$options_str"
     IFS="$IFS_BACKUP"
-    
+
     local num_options=${#options[@]}
     local selected=()
     local i
-    
+
     for ((i=0; i<num_options; i++)); do
         selected+=("true")
     done
-    
+
     local cursor=0
     local scroll_offset=0
     local visible_count=$page_size
     if [ $num_options -lt $visible_count ]; then
         visible_count=$num_options
     fi
-    
+
+    # Check if we can access the terminal directly for input
+    if [ ! -r /dev/tty ]; then
+        eval "$result_var='$options_str'"
+        return 0
+    fi
+
     printf "\033[?25l"
     stty -echo 2>/dev/null
-    
+
     cleanup() {
         printf "\033[?25h"
         stty echo 2>/dev/null
     }
     trap cleanup INT TERM EXIT
-    
+
     for ((i=0; i<visible_count+2; i++)); do
         printf "\n"
     done
-    
+
     render_menu() {
         printf "\033[%dA" "$((visible_count + 2))"
-        
+
         local count=0
         for ((i=0; i<num_options; i++)); do
             if [ "${selected[$i]}" = "true" ]; then
@@ -135,35 +141,35 @@ multiselect_menu() {
             printf " ${BLUE}(showing $((scroll_offset+1))-$((scroll_offset+visible_count)) of $num_options)${NC}"
         fi
         printf "\n"
-        
+
         for ((i=0; i<visible_count; i++)); do
             local idx=$((scroll_offset + i))
             printf "\033[2K"
-            
+
             if [ "${selected[$idx]}" = "true" ]; then
                 printf "${GREEN}[*]${NC} "
             else
                 printf "[ ] "
             fi
-            
+
             if [ $idx -eq $cursor ]; then
                 printf "${REVERSE}${options[$idx]}${RESET}\n"
             else
                 printf "${options[$idx]}\n"
             fi
         done
-        
+
         printf "\033[2K${NC}↑↓:navigate  SPACE:toggle  A:all  N:none  ENTER:confirm  Q:quit${NC}\n"
     }
-    
+
     render_menu
-    
+
     while true; do
         local key
-        IFS= read -rsn1 key 2>/dev/null
-        
+        IFS= read -rsn1 key 2>/dev/null < /dev/tty
+
         if [ "$key" = $'\033' ]; then
-            read -rsn2 -t 0.1 key 2>/dev/null
+            read -rsn2 -t 0.1 key 2>/dev/null < /dev/tty
             case "$key" in
                 '[A'|'[D')
                     if [ $cursor -gt 0 ]; then
@@ -224,7 +230,7 @@ multiselect_menu() {
                 '')
                     cleanup
                     trap - INT TERM EXIT
-                    
+
                     local result=""
                     for ((i=0; i<num_options; i++)); do
                         if [ "${selected[$i]}" = "true" ]; then
@@ -240,23 +246,23 @@ multiselect_menu() {
                     ;;
             esac
         fi
-        
+
         render_menu
     done
 }
 
 create_short_url() {
     local long_url="$1"
-    
+
     if ! command -v curl &> /dev/null; then
         return 1
     fi
-    
+
     local response=$(curl -s -X POST "https://spoo.me/api/v1/shorten" \
         -H "Content-Type: application/json" \
         -d "{\"long_url\":\"$long_url\"}" \
         --connect-timeout 5 --max-time 10 2>/dev/null || echo "")
-    
+
     if [ -n "$response" ]; then
         local short_url=$(echo "$response" | grep -o '"short_url":"[^"]*"' | cut -d'"' -f4)
         if [ -n "$short_url" ]; then
@@ -264,16 +270,16 @@ create_short_url() {
             return 0
         fi
     fi
-    
+
     local encoded_url=$(printf '%s' "$long_url" | sed 's/:/%3A/g; s|/|%2F|g; s/?/%3F/g; s/&/%26/g; s/=/%3D/g; s/+/%2B/g; s/ /%20/g')
     response=$(curl -s "https://is.gd/create.php?format=simple&url=$encoded_url" \
         --connect-timeout 5 --max-time 10 2>/dev/null || echo "")
-    
+
     if [ -n "$response" ] && [[ "$response" =~ ^https://is.gd/ ]]; then
         echo "$response"
         return 0
     fi
-    
+
     return 1
 }
 
@@ -327,13 +333,13 @@ echo
 
 SELECTED_PACKAGES="$ALL_PACKAGES"
 
-if [ "$SKIP_SELECTION" = false ] && [ -t 0 ]; then
+if [ "$SKIP_SELECTION" = false ] && [ -r /dev/tty ]; then
     if multiselect_menu "$ALL_PACKAGES" SELECTED_PACKAGES 15; then
         if [ -z "$SELECTED_PACKAGES" ]; then
             echo -e "${YELLOW}⚠️  No packages selected${NC}"
             exit 0
         fi
-        
+
         SELECTED_COUNT=$(echo "$SELECTED_PACKAGES" | tr ',' '\n' | wc -l | tr -d ' ')
         echo
         echo -e "${GREEN}✅ Selected $SELECTED_COUNT packages${NC}"
@@ -371,10 +377,10 @@ generate_short() {
 
 if [ "$CREATE_SHORT_URL" = true ]; then
     generate_short
-elif [ -t 0 ]; then
+elif [ -r /dev/tty ]; then
     echo
     echo -ne "${BLUE}Generate short URL? [y/N]:${NC} "
-    read -rsn1 answer
+    read -rsn1 answer < /dev/tty
     echo
     if [[ "$answer" =~ ^[Yy]$ ]]; then
         generate_short
