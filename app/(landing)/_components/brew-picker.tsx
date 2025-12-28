@@ -217,7 +217,7 @@ export function BrewPicker({ apps, categories }: BrewPickerProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <Header
           selectedCount={selectedCount}
           onClearAll={handleClearAll}

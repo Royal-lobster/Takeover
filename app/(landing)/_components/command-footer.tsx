@@ -29,7 +29,7 @@ export function CommandFooter({
   const commandLabel = isUninstallMode ? "uninstall" : "install";
 
   return (
-    <footer className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+    <footer className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
       <div className="mx-auto max-w-6xl px-4 py-4">
         <div className="flex items-stretch gap-3">
           <Toggle
