@@ -16,6 +16,7 @@ import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Textarea } from "@/app/components/ui/textarea";
 import { Toggle } from "@/app/components/ui/toggle";
+import { Switch } from "@/components/ui/switch";
 import { createShortURL } from "@/lib/api/shorturl";
 
 interface ShareDialogProps {
@@ -56,6 +57,7 @@ export function ShareDialog({
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
@@ -73,6 +75,7 @@ export function ShareDialog({
 
   const name = watch("name");
   const description = watch("description");
+  const createShortLink = watch("createShortLink");
 
   const onSubmit = async (data: FormData) => {
     setError("");
@@ -183,19 +186,20 @@ export function ShareDialog({
           </Field>
 
           {!isLinkGenerated && (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="create-short-link"
-                className="size-4 rounded border-input"
-                {...register("createShortLink")}
-              />
+            <div className="flex items-center justify-between gap-3">
               <Label
                 htmlFor="create-short-link"
                 className="cursor-pointer font-normal text-sm"
               >
                 Create short link for easier sharing
               </Label>
+              <Switch
+                id="create-short-link"
+                checked={createShortLink}
+                onCheckedChange={(checked: boolean) =>
+                  setValue("createShortLink", checked)
+                }
+              />
             </div>
           )}
 

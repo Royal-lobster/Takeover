@@ -3,7 +3,7 @@
 import { CheckIcon, CopyIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 
 import { Button } from "@/app/components/ui/button";
-import { Switch } from "@/app/components/ui/switch";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 interface CommandFooterProps {
@@ -100,7 +100,6 @@ export function CommandFooter({
                 checked={isUninstallMode}
                 onCheckedChange={onToggleMode}
                 aria-label="Toggle uninstall mode"
-                className="data-[state=checked]:border-destructive/60 data-[state=checked]:bg-destructive/20 data-[state=checked]:ring-1 data-[state=checked]:ring-destructive/30"
               />
             </div>
           </div>
