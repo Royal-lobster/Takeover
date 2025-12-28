@@ -84,6 +84,33 @@ const BROWSER_APPS: Array<App> = [
     iconUrl: favicon("browser.kagi.com"),
     isCask: true,
   },
+  {
+    id: "zen-browser",
+    name: "Zen Browser",
+    brewName: "zen",
+    category: AppCategoryEnum.enum.browsers,
+    description: "Performance-focused, privacy-friendly Firefox fork",
+    iconUrl: favicon("zen-browser.app"),
+    isCask: true,
+  },
+  {
+    id: "librewolf",
+    name: "LibreWolf",
+    brewName: "librewolf",
+    category: AppCategoryEnum.enum.browsers,
+    description: "Community-maintained Firefox fork with privacy defaults",
+    iconUrl: simpleIcon("firefox"),
+    isCask: true,
+  },
+  {
+    id: "mullvad-browser",
+    name: "Mullvad Browser",
+    brewName: "mullvad-browser",
+    category: AppCategoryEnum.enum.browsers,
+    description: "Privacy browser to reduce tracking and fingerprinting",
+    iconUrl: favicon("mullvad.net"),
+    isCask: true,
+  },
 ];
 
 const DEVELOPMENT_APPS: Array<App> = [
@@ -346,6 +373,15 @@ const DEVELOPMENT_APPS: Array<App> = [
     category: AppCategoryEnum.enum.development,
     description: "Swiss Army knife for developers",
     iconUrl: favicon("devtoys.app"),
+    isCask: true,
+  },
+  {
+    id: "ghostty",
+    name: "Ghostty",
+    brewName: "ghostty",
+    category: AppCategoryEnum.enum.development,
+    description: "GPU-accelerated, native terminal emulator",
+    iconUrl: favicon("ghostty.org"),
     isCask: true,
   },
 ];
@@ -983,6 +1019,33 @@ const UTILITY_APPS: Array<App> = [
     isCask: true,
     invertInDark: true,
   },
+  {
+    id: "hammerspoon",
+    name: "Hammerspoon",
+    brewName: "hammerspoon",
+    category: AppCategoryEnum.enum.utilities,
+    description: "Desktop automation for macOS",
+    iconUrl: favicon("www.hammerspoon.org"),
+    isCask: true,
+  },
+  {
+    id: "bettertouchtool",
+    name: "BetterTouchTool",
+    brewName: "bettertouchtool",
+    category: AppCategoryEnum.enum.utilities,
+    description: "Customize input devices and automate workflows",
+    iconUrl: favicon("folivora.ai"),
+    isCask: true,
+  },
+  {
+    id: "mos",
+    name: "Mos",
+    brewName: "mos",
+    category: AppCategoryEnum.enum.utilities,
+    description: "Smooth scrolling and per-device scroll settings",
+    iconUrl: favicon("mos.caldis.me"),
+    isCask: true,
+  },
 ];
 
 const SECURITY_APPS: Array<App> = [
@@ -1111,6 +1174,15 @@ const SECURITY_APPS: Array<App> = [
     description: "Cross-platform password manager",
     iconUrl: simpleIcon("keepassxc"),
     isCask: true,
+  },
+  {
+    id: "tailscale",
+    name: "Tailscale",
+    brewName: "tailscale",
+    category: AppCategoryEnum.enum.security,
+    description: "Zero-config secure networking based on WireGuard",
+    iconUrl: favicon("tailscale.com"),
+    isCask: false,
   },
 ];
 
@@ -1342,6 +1414,33 @@ const CLI_APPS: Array<App> = [
     iconUrl: simpleIcon("cmake"),
     isCask: false,
   },
+  {
+    id: "atuin",
+    name: "atuin",
+    brewName: "atuin",
+    category: AppCategoryEnum.enum.cli,
+    description: "Sync and searchable shell history",
+    iconUrl: favicon("atuin.sh"),
+    isCask: false,
+  },
+  {
+    id: "btop",
+    name: "btop",
+    brewName: "btop",
+    category: AppCategoryEnum.enum.cli,
+    description: "Modern resource monitor",
+    iconUrl: favicon("github.com"),
+    isCask: false,
+  },
+  {
+    id: "zellij",
+    name: "Zellij",
+    brewName: "zellij",
+    category: AppCategoryEnum.enum.cli,
+    description: "Pluggable terminal workspace and multiplexer",
+    iconUrl: favicon("zellij.dev"),
+    isCask: false,
+  },
 ];
 
 const LANGUAGES_APPS: Array<App> = [
@@ -1426,6 +1525,15 @@ const LANGUAGES_APPS: Array<App> = [
     category: AppCategoryEnum.enum.languages,
     description: "Scala programming language",
     iconUrl: simpleIcon("scala"),
+    isCask: false,
+  },
+  {
+    id: "deno",
+    name: "Deno",
+    brewName: "deno",
+    category: AppCategoryEnum.enum.languages,
+    description: "Secure JavaScript and TypeScript runtime",
+    iconUrl: simpleIcon("deno"),
     isCask: false,
   },
 ];
@@ -1753,6 +1861,15 @@ const DESIGN_APPS: Array<App> = [
     category: AppCategoryEnum.enum.design,
     description: "Interactive design tool",
     iconUrl: simpleIcon("framer"),
+    isCask: true,
+  },
+  {
+    id: "krita",
+    name: "Krita",
+    brewName: "krita",
+    category: AppCategoryEnum.enum.design,
+    description: "Open-source painting and sketching",
+    iconUrl: favicon("krita.org"),
     isCask: true,
   },
 ];
