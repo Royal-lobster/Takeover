@@ -1,5 +1,4 @@
 import { APPS } from "@/lib/data/apps";
-import { CATEGORIES } from "@/lib/schema";
 import { lookupPackageTypes } from "./_actions";
 import { BrewPicker } from "./_components/brew-picker";
 
@@ -51,8 +50,6 @@ export default async function HomePage({
 
   return (
     <BrewPicker
-      apps={APPS}
-      categories={CATEGORIES}
       kitName={kitName}
       kitDescription={kitDescription}
       initialSelectedAppIds={selectedAppIds}

@@ -9,41 +9,27 @@ import {
   TerminalWindowIcon,
   XIcon,
 } from "@phosphor-icons/react";
-import type { ReactNode } from "react";
+import { useBrewPickerContext } from "@/app/(landing)/_hooks/use-brew-picker-context";
+import { useSearchQuery } from "@/app/(landing)/_hooks/use-search-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-interface AppShellProps {
-  children: ReactNode;
-  selectedCount: number;
-  onClearAll: () => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  brewCommand: string;
-  uninstallCommand: string;
-  copied: boolean;
-  isUninstallMode: boolean;
-  onCopy: () => void;
-  onToggleMode: () => void;
-  onShare?: () => void;
-}
+export function AppShell({ children }: React.PropsWithChildren) {
+  const {
+    selectedCount,
+    onClearAll,
+    brewCommand,
+    uninstallCommand,
+    copied,
+    isUninstallMode,
+    onCopy,
+    onToggleMode,
+    onShare,
+  } = useBrewPickerContext();
 
-export function AppShell({
-  children,
-  selectedCount,
-  onClearAll,
-  searchQuery,
-  onSearchChange,
-  brewCommand,
-  uninstallCommand,
-  copied,
-  isUninstallMode,
-  onCopy,
-  onToggleMode,
-  onShare,
-}: AppShellProps) {
+  const { searchQuery, setSearchQuery } = useSearchQuery();
   const displayCommand = isUninstallMode ? uninstallCommand : brewCommand;
   const commandLabel = isUninstallMode ? "uninstall" : "install";
   const controlHeight = "h-9 min-h-[36px]";
@@ -84,14 +70,14 @@ export function AppShell({
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    onSearchChange(e.target.value)
+                    setSearchQuery(e.target.value)
                   }
                   className="h-9 w-full pl-8 pr-8 font-mono text-sm sm:h-8 sm:w-56 sm:text-xs"
                 />
                 {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => onSearchChange("")}
+                    onClick={() => setSearchQuery("")}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
                   >
                     <XIcon className="size-3.5" />

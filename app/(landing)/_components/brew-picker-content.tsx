@@ -4,7 +4,10 @@ import Fuse from "fuse.js";
 import * as React from "react";
 import { APPS } from "@/lib/data/apps";
 import type { App, AppCategory } from "@/lib/schema";
+import { CATEGORIES } from "@/lib/schema";
 import type { SearchResult } from "../_actions";
+import { useBrewPickerContext } from "../_hooks/use-brew-picker-context";
+import { useSearchQuery } from "../_hooks/use-search-query";
 import { AppCard } from "./app-card";
 import { AppGridView } from "./app-grid-view";
 import { CategoryFilter } from "./category-filter";
@@ -17,65 +20,38 @@ import { EmptySearchState } from "./empty-search-state";
 import { HomebrewSearchDialog } from "./homebrew-search-dialog";
 import { ShareDialog } from "./share-dialog";
 
-interface BrewPickerContentProps {
-  apps: Array<App>;
-  categories: Array<{ id: AppCategory; label: string }>;
-  kitName?: string;
-  kitDescription?: string;
-  sharedAppIds: Set<string>;
-  sharedCustomTokens: Set<string>;
-  selectedApps: Set<string>;
-  toggleApp: (id: string) => void;
-  customPackages: Map<
-    string,
-    { token: string; name: string; type: "cask" | "formula" }
-  >;
-  selectedCustomPackages: Set<string>;
-  toggleCustomPackage: (token: string) => void;
-  removeCustomPackage: (token: string) => void;
-  addCustomPackage: (pkg: {
-    token: string;
-    name: string;
-    type: "cask" | "formula";
-  }) => void;
-  selectedTokens: Set<string>;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  isShareDialogOpen: boolean;
-  setIsShareDialogOpen: (open: boolean) => void;
-}
+export function BrewPickerContent() {
+  const {
+    sharedAppIds,
+    sharedCustomTokens,
+    selectedApps,
+    toggleApp,
+    customPackages,
+    selectedCustomPackages,
+    toggleCustomPackage,
+    removeCustomPackage,
+    addCustomPackage,
+    selectedTokens,
+    isShareDialogOpen,
+    setIsShareDialogOpen,
+    kitName,
+    kitDescription,
+  } = useBrewPickerContext();
 
-export function BrewPickerContent({
-  apps,
-  categories,
-  kitName,
-  kitDescription,
-  sharedAppIds,
-  sharedCustomTokens,
-  selectedApps,
-  toggleApp,
-  customPackages,
-  selectedCustomPackages,
-  toggleCustomPackage,
-  removeCustomPackage,
-  addCustomPackage,
-  selectedTokens,
-  searchQuery,
-  isShareDialogOpen,
-  setIsShareDialogOpen,
-}: BrewPickerContentProps) {
+  const { searchQuery } = useSearchQuery();
+
   const [selectedCategory, setSelectedCategory] = React.useState<
     AppCategory | "all"
   >("all");
 
   const fuse = React.useMemo(
     () =>
-      new Fuse(apps, {
+      new Fuse(APPS, {
         keys: ["name", "description", "brewName"],
         threshold: 0.4,
         ignoreLocation: true,
       }),
-    [apps],
+    [],
   );
 
   const filteredApps = React.useMemo(() => {
@@ -85,7 +61,7 @@ export function BrewPickerContent({
       const results = fuse.search(searchQuery.trim());
       result = results.map((r) => r.item);
     } else {
-      result = apps;
+      result = APPS;
     }
 
     if (selectedCategory !== "all") {
@@ -93,11 +69,11 @@ export function BrewPickerContent({
     }
 
     return result;
-  }, [searchQuery, selectedCategory, fuse, apps]);
+  }, [searchQuery, selectedCategory, fuse]);
 
   const appsByCategory = React.useMemo(() => {
     const grouped = new Map<AppCategory, Array<App>>();
-    for (const category of categories) {
+    for (const category of CATEGORIES) {
       const categoryApps = filteredApps.filter(
         (app) => app.category === category.id,
       );
@@ -106,7 +82,7 @@ export function BrewPickerContent({
       }
     }
     return grouped;
-  }, [filteredApps, categories]);
+  }, [filteredApps]);
 
   const handleSelectPackage = React.useCallback(
     (pkg: SearchResult) => {
@@ -134,7 +110,7 @@ export function BrewPickerContent({
       <div className="border-b border-border">
         <div className="mx-auto max-w-6xl px-4 py-2">
           <CategoryFilter
-            categories={categories}
+            categories={CATEGORIES}
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
           />
@@ -165,7 +141,7 @@ export function BrewPickerContent({
               <div className="mb-12">
                 <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {Array.from(sharedAppIds)
-                    .map((id) => apps.find((app) => app.id === id))
+                    .map((id) => APPS.find((app) => app.id === id))
                     .filter((app): app is App => app !== undefined)
                     .map((app) => (
                       <AppCard
@@ -207,7 +183,7 @@ export function BrewPickerContent({
             showCategorySections ? (
               <CategoryGridView
                 appsByCategory={appsByCategory}
-                categories={categories}
+                categories={CATEGORIES}
                 selectedApps={selectedApps}
                 onToggle={toggleApp}
               />
