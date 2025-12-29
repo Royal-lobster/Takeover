@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useFullCatalog } from "@/app/(landing)/_hooks/use-full-catalog";
 import {
@@ -26,6 +27,8 @@ export function usePackageSelection(
   initialFullCatalogPackages: InitialPackage[],
 ) {
   const { getPackage } = useFullCatalog();
+  const params = useSearchParams();
+  const hasKitName = params.get("name");
 
   // Resolve package types for initial full catalog packages
   const resolvedInitialPackages = useMemo(() => {
@@ -44,19 +47,23 @@ export function usePackageSelection(
     [resolvedInitialPackages],
   );
 
-  // Initialize from URL on mount
+  // Initialize from URL on mount or when URL parameters change
   const initializeFromUrl = usePackageStore((state) => state.initializeFromUrl);
   const hydrated = usePackageStore((state) => state.hydrated);
 
   useEffect(() => {
+    // Only initialize from URL if we have a kit name parameter
+    // This allows persisted state to work when there's no kit name
     if (
       hydrated &&
+      hasKitName &&
       (initialSelectedAppIds.length > 0 || resolvedInitialPackages.length > 0)
     ) {
       initializeFromUrl(initialSelectedAppIds, resolvedInitialPackages);
     }
   }, [
     hydrated,
+    hasKitName,
     initialSelectedAppIds,
     resolvedInitialPackages,
     initializeFromUrl,

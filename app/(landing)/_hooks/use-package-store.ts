@@ -134,34 +134,13 @@ export const usePackageStore = create<PackageSelectionState>()(
         appIds: string[],
         fullCatalogPkgs: FullCatalogPackageInput[],
       ) => {
-        set((state) => {
-          // Merge URL packages with existing, avoiding duplicates
-          const existingTokens = new Set(
-            state.fullCatalogPackages.map((p) => p.token),
-          );
-          const newPackages = fullCatalogPkgs.filter(
-            (pkg) => !existingTokens.has(pkg.token),
-          );
-
-          // Merge app IDs, avoiding duplicates
-          const existingAppIds = new Set(state.selectedAppIds);
-          const newAppIds = appIds.filter((id) => !existingAppIds.has(id));
-
-          // Merge selected full catalog package IDs
-          const existingSelectedIds = new Set(
-            state.selectedFullCatalogPackageIds,
-          );
-          const newSelectedIds = fullCatalogPkgs
-            .map((p) => p.token)
-            .filter((id) => !existingSelectedIds.has(id));
-
+        set(() => {
+          // Replace existing packages with URL packages instead of merging
+          // This ensures clean state when visiting different share URLs
           return {
-            selectedAppIds: [...state.selectedAppIds, ...newAppIds],
-            fullCatalogPackages: [...state.fullCatalogPackages, ...newPackages],
-            selectedFullCatalogPackageIds: [
-              ...state.selectedFullCatalogPackageIds,
-              ...newSelectedIds,
-            ],
+            selectedAppIds: [...appIds],
+            fullCatalogPackages: [...fullCatalogPkgs],
+            selectedFullCatalogPackageIds: fullCatalogPkgs.map((p) => p.token),
           };
         });
       },
