@@ -1,249 +1,80 @@
 "use client";
 
-import Fuse from "fuse.js";
-import { useSearchParams } from "next/navigation";
-import * as React from "react";
-import { APPS } from "@/lib/data/apps";
-import type { App, AppCategory } from "@/lib/data/schema";
+import { useState } from "react";
+import type { AppCategory } from "@/lib/data/schema";
 import { CATEGORIES } from "@/lib/data/schema";
-import { useHomebrewCatalogue } from "@/lib/hooks/use-catalogue";
-import type { SearchResult } from "@/lib/integrations/search";
-import { AppCard } from "./_components/app-card";
+import { AppGrid, AppGridByCategory } from "./_components/app-grid-by-category";
 import { Categories } from "./_components/categories";
 import { CommandFooter } from "./_components/command-footer";
 import { FullCatalogPackagesSection } from "./_components/full-catalog-package";
-import { FullCatalogSearch } from "./_components/full-catalog-search";
 import { Header } from "./_components/header";
+import { KitHeader } from "./_components/kit-header";
+import {
+  FullCatalogSearchSection,
+  SearchResultsSection,
+} from "./_components/search-results-section";
 import { ShareDialog } from "./_components/share-dialog";
 import { SyncDialog } from "./_components/sync-dialog";
-import { useAppSelection } from "./_hooks/use-app-selection";
-import { useBrewCommands } from "./_hooks/use-brew-commands";
-import { useFullCatalogPackages } from "./_hooks/use-full-catalog-packages";
+import { useFilteredApps } from "./_hooks/use-filtered-apps";
+import { usePackageSelection } from "./_hooks/use-package-selection";
 import { useSearchQuery } from "./_hooks/use-search-query";
 import { useShareDialog } from "./_hooks/use-share-dialog";
+import { useSyncDialog } from "./_hooks/use-sync-dialog";
+import { useUrlParams } from "./_hooks/use-url-params";
 
 export default function HomePage() {
-  const params = useSearchParams();
-  const kitName = params.get("name") || undefined;
-  const kitDescription = params.get("description") || undefined;
-  const packagesParam = params.get("packages") || "";
-
-  const packageTokens = packagesParam
-    .split(",")
-    .map((p: string) => p.trim())
-    .filter(Boolean);
-
-  const selectedAppIds: string[] = [];
-  const externalTokens: string[] = [];
-
-  // First pass: identify which packages are in our curated list
-  for (const token of packageTokens) {
-    const app = APPS.find((a) => a.id === token || a.brewName === token);
-    if (app) {
-      selectedAppIds.push(app.id);
-    } else if (token) {
-      externalTokens.push(token);
-    }
-  }
-
-  // Pass external tokens to be resolved in the client component
-  const initialCustomPackages: Array<{
-    token: string;
-    name: string;
-    type: "cask" | "formula";
-  }> = externalTokens.map((token) => ({
-    token,
-    name: token,
-    type: "cask" as const, // Default to cask, will be resolved in client
-  }));
-
-  return (
-    <AppPickerClient
-      kitName={kitName}
-      kitDescription={kitDescription}
-      initialSelectedAppIds={selectedAppIds}
-      initialCustomPackages={initialCustomPackages}
-    />
-  );
-}
-
-interface AppPickerClientProps {
-  initialSelectedAppIds?: string[];
-  initialCustomPackages?: Array<{
-    token: string;
-    name: string;
-    type: "cask" | "formula";
-  }>;
-  kitName?: string;
-  kitDescription?: string;
-}
-
-function AppPickerClient({
-  initialSelectedAppIds = [],
-  initialCustomPackages = [],
-  kitName,
-  kitDescription,
-}: AppPickerClientProps) {
-  // Use catalogue hook to resolve package types
-  const { getPackage } = useHomebrewCatalogue();
-
-  // Resolve package types for initial custom packages
-  const resolvedInitialPackages = React.useMemo(() => {
-    return initialCustomPackages.map((pkg) => {
-      const cataloguePackage = getPackage(pkg.token);
-      return {
-        ...pkg,
-        type: cataloguePackage?.type || pkg.type,
-      };
-    });
-  }, [initialCustomPackages, getPackage]);
-
-  // Initialize shared data sets
-  const sharedCustomTokens = React.useMemo(
-    () => new Set(resolvedInitialPackages.map((pkg) => pkg.token)),
-    [resolvedInitialPackages],
-  );
-
-  // Local state management hooks
-  const { selectedApps, toggleApp, clearAll } = useAppSelection(
-    initialSelectedAppIds,
-  );
-
+  // URL parameters
   const {
+    kitName,
+    kitDescription,
+    initialSelectedAppIds,
+    initialCustomPackages,
+  } = useUrlParams();
+
+  // Package selection state (apps + custom packages)
+  const {
+    selectedApps,
+    toggleApp,
     customPackages,
     selectedCustomPackages,
-    selectedCustomPackagesMap,
+    sharedCustomTokens,
     toggleCustomPackage,
-    addCustomPackage,
     removeCustomPackage,
-  } = useFullCatalogPackages(resolvedInitialPackages, sharedCustomTokens);
+    handleSelectPackage,
+    selectedCount,
+    selectedAppNames,
+    selectedTokens,
+    brewCommand,
+    uninstallCommand,
+    clearAll,
+  } = usePackageSelection(initialSelectedAppIds, initialCustomPackages);
 
-  const { brewCommand, uninstallCommand, selectedTokens } = useBrewCommands(
-    selectedApps,
-    selectedCustomPackagesMap,
+  // UI state
+  const { searchQuery } = useSearchQuery();
+  const [selectedCategory, setSelectedCategory] = useState<AppCategory | "all">(
+    "all",
   );
 
-  // Share dialog state
+  // Dialog state
   const { isShareDialogOpen, openShareDialog, setShareDialogOpen } =
     useShareDialog();
+  const { isSyncDialogOpen, openSyncDialog, setSyncDialogOpen } =
+    useSyncDialog();
 
-  // Sync dialog state
-  const [isSyncDialogOpen, setIsSyncDialogOpen] = React.useState(false);
-
-  const handleSyncClick = () => {
-    setIsSyncDialogOpen(true);
-  };
-
-  // Local UI state
-  const { searchQuery } = useSearchQuery();
-  const [selectedCategory, setSelectedCategory] = React.useState<
-    AppCategory | "all"
-  >("all");
-
-  // Derived state
-  const selectedCount = selectedApps.size + selectedCustomPackages.size;
-
-  // Clear all selections (respecting shared items)
-  const handleClearAll = () => {
-    clearAll();
-    if (customPackages.size > 0) {
-      for (const token of customPackages.keys()) {
-        if (!sharedCustomTokens.has(token)) {
-          removeCustomPackage(token);
-        }
-      }
-    }
-  };
-
-  // Search functionality
-  const fuse = React.useMemo(
-    () =>
-      new Fuse(APPS, {
-        keys: ["name", "description", "brewName"],
-        threshold: 0.4,
-        ignoreLocation: true,
-      }),
-    [],
+  // Filtered apps based on search and category
+  const { filteredApps, appsByCategory, hasSearchQuery } = useFilteredApps(
+    searchQuery,
+    selectedCategory,
   );
 
-  const filteredApps = React.useMemo(() => {
-    let result: Array<App>;
-
-    if (searchQuery.trim()) {
-      const results = fuse.search(searchQuery.trim());
-      result = results.map((r) => r.item);
-    } else {
-      result = APPS;
-    }
-
-    if (selectedCategory !== "all") {
-      result = result.filter((app) => app.category === selectedCategory);
-    }
-
-    return result;
-  }, [searchQuery, selectedCategory, fuse]);
-
-  const appsByCategory = React.useMemo(() => {
-    const grouped = new Map<AppCategory, Array<App>>();
-    for (const category of CATEGORIES) {
-      const categoryApps = filteredApps.filter(
-        (app) => app.category === category.id,
-      );
-      if (categoryApps.length > 0) {
-        grouped.set(category.id, categoryApps);
-      }
-    }
-    return grouped;
-  }, [filteredApps]);
-
-  const handleSelectPackage = React.useCallback(
-    (pkg: SearchResult) => {
-      const existingApp = APPS.find((app) => app.brewName === pkg.token);
-      if (existingApp) {
-        toggleApp(existingApp.id);
-        return;
-      }
-
-      // Resolve type from catalogue if available, otherwise use the provided type
-      const cataloguePackage = getPackage(pkg.token);
-      const resolvedType = cataloguePackage?.type || pkg.type;
-
-      addCustomPackage({
-        token: pkg.token,
-        name: pkg.name,
-        type: resolvedType,
-      });
-
-      toggleCustomPackage(pkg.token);
-    },
-    [toggleApp, addCustomPackage, toggleCustomPackage, getPackage],
-  );
-
-  const showCategorySections = selectedCategory === "all";
-
-  // Extract selected app names for analytics
-  const selectedAppNames = React.useMemo(() => {
-    return Array.from(selectedApps)
-      .map((appId) => APPS.find((app) => app.id === appId)?.brewName)
-      .filter(Boolean) as string[];
-  }, [selectedApps]);
-
-  // Share dialog content
-  const shareDialogComponent = (
-    <ShareDialog
-      open={isShareDialogOpen}
-      onOpenChange={setShareDialogOpen}
-      selectedAppIds={Array.from(selectedApps)}
-      fullCatalogPackageTokens={Array.from(selectedCustomPackages)}
-    />
-  );
+  const showCategorySections = selectedCategory === "all" && !hasSearchQuery;
 
   return (
     <>
       <Header
         selectedCount={selectedCount}
-        onClearAll={handleClearAll}
-        onSyncClick={handleSyncClick}
+        onClearAll={clearAll}
+        onSyncClick={openSyncDialog}
       />
 
       <main className="flex-1 pb-24">
@@ -258,20 +89,8 @@ function AppPickerClient({
         </div>
 
         <div className="mx-auto max-w-6xl px-4 py-4">
-          {kitName && (
-            <div className="mb-12 border-b border-border/40 pb-8 pt-12">
-              <h1 className="text-center text-5xl font-bold tracking-tight sm:text-6xl">
-                {kitName}
-              </h1>
-              {kitDescription && (
-                <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-muted-foreground">
-                  {kitDescription}
-                </p>
-              )}
-            </div>
-          )}
+          {kitName && <KitHeader name={kitName} description={kitDescription} />}
 
-          {/* Custom Packages Section */}
           <FullCatalogPackagesSection
             packages={customPackages}
             selectedTokens={selectedCustomPackages}
@@ -281,101 +100,17 @@ function AppPickerClient({
             showCheckbox={true}
           />
 
-          {/* Search Results or Categories */}
-          {searchQuery.trim() ? (
-            <div className="space-y-8">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">
-                  Search Results for "{searchQuery}"
-                </h2>
-              </div>
-
-              {filteredApps.length > 0 ? (
-                <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {filteredApps.map((app) => (
-                    <AppCard
-                      key={app.id}
-                      app={app}
-                      isSelected={selectedApps.has(app.id)}
-                      onToggle={() => toggleApp(app.id)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="py-12 text-center">
-                  <p className="text-muted-foreground">
-                    No apps found matching "{searchQuery}"
-                  </p>
-                </div>
-              )}
-
-              <div className="border-t border-border/40 pt-8">
-                <FullCatalogSearch
-                  onSelectPackage={handleSelectPackage}
-                  selectedTokens={selectedTokens}
-                />
-              </div>
-            </div>
-          ) : showCategorySections ? (
-            <div className="space-y-12">
-              {Array.from(appsByCategory.entries()).map(([category, apps]) => {
-                const categoryInfo = CATEGORIES.find((c) => c.id === category);
-                if (!categoryInfo) return null;
-
-                return (
-                  <section key={category}>
-                    <div className="mb-3 flex items-center gap-2">
-                      <h2 className="font-mono text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        {categoryInfo.label}
-                      </h2>
-                      <span className="font-mono text-[10px] text-muted-foreground/60">
-                        ({apps.length})
-                      </span>
-                      <div className="h-px flex-1 bg-border" />
-                    </div>
-                    <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {apps.map((app) => (
-                        <AppCard
-                          key={app.id}
-                          app={app}
-                          isSelected={selectedApps.has(app.id)}
-                          onToggle={() => toggleApp(app.id)}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
-
-              <div className="border-t border-border/40 pt-8">
-                <FullCatalogSearch
-                  onSelectPackage={handleSelectPackage}
-                  selectedTokens={selectedTokens}
-                />
-              </div>
-            </div>
-          ) : (
-            // Single category view
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredApps.map((app) => (
-                  <AppCard
-                    key={app.id}
-                    app={app}
-                    isSelected={selectedApps.has(app.id)}
-                    onToggle={() => toggleApp(app.id)}
-                  />
-                ))}
-              </div>
-
-              <div className="border-t border-border/40 pt-8">
-                <FullCatalogSearch
-                  onSelectPackage={handleSelectPackage}
-                  selectedTokens={selectedTokens}
-                />
-              </div>
-            </div>
-          )}
+          <AppContent
+            hasSearchQuery={hasSearchQuery}
+            searchQuery={searchQuery}
+            showCategorySections={showCategorySections}
+            filteredApps={filteredApps}
+            appsByCategory={appsByCategory}
+            selectedApps={selectedApps}
+            selectedTokens={selectedTokens}
+            onToggleApp={toggleApp}
+            onSelectPackage={handleSelectPackage}
+          />
         </div>
       </main>
 
@@ -388,8 +123,85 @@ function AppPickerClient({
         onShare={openShareDialog}
       />
 
-      {shareDialogComponent}
-      <SyncDialog open={isSyncDialogOpen} onOpenChange={setIsSyncDialogOpen} />
+      <ShareDialog
+        open={isShareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        selectedAppIds={Array.from(selectedApps)}
+        fullCatalogPackageTokens={Array.from(selectedCustomPackages)}
+      />
+      <SyncDialog open={isSyncDialogOpen} onOpenChange={setSyncDialogOpen} />
     </>
+  );
+}
+
+// --- Content Section Components ---
+
+interface AppContentProps {
+  hasSearchQuery: boolean;
+  searchQuery: string;
+  showCategorySections: boolean;
+  filteredApps: import("@/lib/data/schema").App[];
+  appsByCategory: Map<AppCategory, import("@/lib/data/schema").App[]>;
+  selectedApps: Set<string>;
+  selectedTokens: Set<string>;
+  onToggleApp: (appId: string) => void;
+  onSelectPackage: (
+    pkg: import("@/lib/integrations/search").SearchResult,
+  ) => void;
+}
+
+function AppContent({
+  hasSearchQuery,
+  searchQuery,
+  showCategorySections,
+  filteredApps,
+  appsByCategory,
+  selectedApps,
+  selectedTokens,
+  onToggleApp,
+  onSelectPackage,
+}: AppContentProps) {
+  if (hasSearchQuery) {
+    return (
+      <SearchResultsSection
+        searchQuery={searchQuery}
+        filteredApps={filteredApps}
+        selectedApps={selectedApps}
+        selectedTokens={selectedTokens}
+        onToggleApp={onToggleApp}
+        onSelectPackage={onSelectPackage}
+      />
+    );
+  }
+
+  if (showCategorySections) {
+    return (
+      <div className="space-y-12">
+        <AppGridByCategory
+          appsByCategory={appsByCategory}
+          selectedApps={selectedApps}
+          onToggleApp={onToggleApp}
+        />
+        <FullCatalogSearchSection
+          selectedTokens={selectedTokens}
+          onSelectPackage={onSelectPackage}
+        />
+      </div>
+    );
+  }
+
+  // Single category view
+  return (
+    <div className="space-y-8">
+      <AppGrid
+        apps={filteredApps}
+        selectedApps={selectedApps}
+        onToggleApp={onToggleApp}
+      />
+      <FullCatalogSearchSection
+        selectedTokens={selectedTokens}
+        onSelectPackage={onSelectPackage}
+      />
+    </div>
   );
 }
