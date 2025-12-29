@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useMemo } from "react";
-import { APPS } from "@/lib/data/apps";
+import { CURATED_APPS } from "@/lib/data/curated-catalogue";
 import type { HomepageSearchParams } from "../page";
 
 export interface UrlParams {
@@ -35,7 +35,9 @@ export function useUrlParams({
     const externalTokens: string[] = [];
 
     for (const token of packageTokens) {
-      const app = APPS.find((a) => a.id === token || a.brewName === token);
+      const app = CURATED_APPS.find(
+        (a) => a.id === token || a.brewName === token,
+      );
       if (app) {
         selectedAppIds.push(app.id);
       } else if (token) {

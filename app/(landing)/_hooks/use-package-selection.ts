@@ -13,7 +13,7 @@ import {
   useSelectedFullCatalogPackages,
   useSelectedTokens,
 } from "@/app/(landing)/_hooks/use-package-store";
-import { APPS } from "@/lib/data/apps";
+import { CURATED_APPS } from "@/lib/data/curated-catalogue";
 import type { SearchResult } from "@/lib/integrations/search";
 
 interface InitialPackage {
@@ -108,7 +108,9 @@ export function usePackageSelection(
   const handleSelectPackage = useCallback(
     (pkg: SearchResult) => {
       // Check if it's a curated app first
-      const existingApp = APPS.find((app) => app.brewName === pkg.token);
+      const existingApp = CURATED_APPS.find(
+        (app) => app.brewName === pkg.token,
+      );
       if (existingApp) {
         toggleApp(existingApp.id);
         return;

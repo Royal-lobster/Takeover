@@ -27,7 +27,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { APPS } from "@/lib/data/apps";
+import { CURATED_APPS } from "@/lib/data/curated-catalogue";
 import type { SearchResult } from "@/lib/integrations/search";
 import { useFullCatalogSearch } from "../_hooks/use-full-catalog-search";
 
@@ -219,7 +219,7 @@ export function FullCatalogSearch({
             {query.trim().length >= 2 && results.length > 0 && (
               <CommandGroup heading="Results">
                 {results.map((pkg) => {
-                  const isInCatalog = APPS.some(
+                  const isInCatalog = CURATED_APPS.some(
                     (app) => app.brewName === pkg.token,
                   );
                   return (

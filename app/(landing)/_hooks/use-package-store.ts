@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { APPS } from "@/lib/data/apps";
+import { CURATED_APPS } from "@/lib/data/curated-catalogue";
 import type { FullCatalogPackage } from "@/lib/helpers/brew-commands";
 import { generateBulkBrewCommand } from "@/lib/helpers/brew-commands";
 
@@ -232,7 +232,7 @@ export function useSelectedAppNames() {
   if (!hydrated) return [];
 
   return selectedAppIds
-    .map((appId) => APPS.find((app) => app.id === appId)?.brewName)
+    .map((appId) => CURATED_APPS.find((app) => app.id === appId)?.brewName)
     .filter((name): name is string => Boolean(name));
 }
 
@@ -248,7 +248,7 @@ export function useSelectedTokens() {
   const tokens = new Set<string>();
 
   for (const appId of selectedAppIds) {
-    const app = APPS.find((a) => a.id === appId);
+    const app = CURATED_APPS.find((a) => a.id === appId);
     if (app) {
       tokens.add(app.brewName);
     }

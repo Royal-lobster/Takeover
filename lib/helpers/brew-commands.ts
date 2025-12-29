@@ -1,4 +1,4 @@
-import { APPS } from "@/lib/data/apps";
+import { CURATED_APPS } from "@/lib/data/curated-catalogue";
 import type { App } from "@/lib/data/schema";
 
 export interface FullCatalogPackage {
@@ -24,7 +24,7 @@ export function generateBulkBrewCommand(
   if (appIds.length === 0 && fullCatalogPackages.size === 0) return "";
 
   const apps = appIds
-    .map((id) => APPS.find((app) => app.id === id))
+    .map((id) => CURATED_APPS.find((app) => app.id === id))
     .filter((app): app is App => app !== undefined);
 
   const allCasks: string[] = [];

@@ -1,6 +1,6 @@
 "use client";
 
-import { APPS } from "@/lib/data/apps";
+import { CURATED_APPS } from "@/lib/data/curated-catalogue";
 import { AppSelectionCard } from "./app-selection-card";
 import { FullCatalogSelectionCard } from "./full-catalog-selection-card";
 
@@ -29,7 +29,9 @@ export function KitSection({
   onToggleApp,
   onToggleFullCatalogPackage,
 }: KitSectionProps) {
-  const preselectedApps = APPS.filter((app) => selectedAppIds.includes(app.id));
+  const preselectedApps = CURATED_APPS.filter((app) =>
+    selectedAppIds.includes(app.id),
+  );
   const totalCount = preselectedApps.length + fullCatalogPackages.length;
 
   return (

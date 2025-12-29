@@ -2,12 +2,12 @@
 
 import Fuse from "fuse.js";
 import { useMemo } from "react";
-import { APPS } from "@/lib/data/apps";
+import { CURATED_APPS } from "@/lib/data/curated-catalogue";
 import type { App, AppCategory } from "@/lib/data/schema";
 import { CATEGORIES } from "@/lib/data/schema";
 
 // Static Fuse instance - APPS never changes, so we can create this once
-const appSearchIndex = new Fuse(APPS, {
+const appSearchIndex = new Fuse(CURATED_APPS, {
   keys: ["name", "description", "brewName"],
   threshold: 0.4,
   ignoreLocation: true,
@@ -24,7 +24,7 @@ export function useFilteredApps(
     if (trimmedQuery) {
       result = appSearchIndex.search(trimmedQuery).map((r) => r.item);
     } else {
-      result = APPS;
+      result = CURATED_APPS;
     }
 
     if (selectedCategory !== "all") {
