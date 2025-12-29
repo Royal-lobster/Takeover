@@ -177,6 +177,7 @@ const DEVELOPMENT_APPS: Array<App> = [
     category: AppCategoryEnum.enum.development,
     description: "Fast, feature-rich GPU terminal",
     iconUrl: simpleIcon("gnometerminal"),
+    invertInDark: true,
     isCask: true,
   },
   {
@@ -1272,6 +1273,7 @@ const CLI_APPS: Array<App> = [
     category: AppCategoryEnum.enum.cli,
     description: "JSON query and transformation tool",
     iconUrl: simpleIcon("json"),
+    invertInDark: true,
     isCask: false,
   },
   {
@@ -1430,6 +1432,7 @@ const CLI_APPS: Array<App> = [
     category: AppCategoryEnum.enum.cli,
     description: "Modern resource monitor",
     iconUrl: favicon("github.com"),
+    invertInDark: true,
     isCask: false,
   },
   {
