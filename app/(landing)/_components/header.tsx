@@ -8,6 +8,7 @@ import {
   TrashIcon,
   XIcon,
 } from "@phosphor-icons/react";
+import Link from "next/link";
 import { useQueryState } from "nuqs";
 import type * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,10 @@ export function Header({ selectedCount, onClearAll }: HeaderProps) {
         {/* Desktop Header */}
         <div className="hidden sm:flex sm:items-center sm:justify-between sm:gap-4">
           {/* Left: Logo & Branding */}
-          <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="flex items-center gap-3 transition-opacity hover:opacity-80"
+          >
             <div className="relative flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <TerminalWindowIcon className="size-5" weight="bold" />
               {/* Selection indicator dot */}
@@ -54,7 +58,7 @@ export function Header({ selectedCount, onClearAll }: HeaderProps) {
                 Select → Copy → Install
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Center: Search */}
           <div className="relative max-w-md flex-1">
@@ -90,10 +94,8 @@ export function Header({ selectedCount, onClearAll }: HeaderProps) {
                 type: "button",
               }}
             >
-              <>
-                <CloudArrowUpIcon className="size-4" weight="bold" />
-                <span>Sync</span>
-              </>
+              <CloudArrowUpIcon className="size-4" weight="bold" />
+              <span>Sync</span>
             </SyncDialog>
             <a
               href="https://github.com/Royal-lobster/InstallKit"
@@ -126,7 +128,10 @@ export function Header({ selectedCount, onClearAll }: HeaderProps) {
         <div className="flex flex-col gap-3 sm:hidden">
           {/* Top row: Logo, actions, selection badge */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+            >
               <div className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <TerminalWindowIcon className="size-4" weight="bold" />
               </div>
@@ -135,7 +140,7 @@ export function Header({ selectedCount, onClearAll }: HeaderProps) {
                   INSTALLKIT
                 </h1>
               </div>
-            </div>
+            </Link>
             <div className="flex items-center gap-1">
               {/* Selection badge with clear action */}
               <button
