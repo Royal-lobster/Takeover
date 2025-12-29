@@ -88,6 +88,7 @@ export default function HomePage() {
               selectedApps={selectedApps}
               selectedTokens={selectedTokens}
               onToggleApp={toggleApp}
+              onToggleFullCatalogPackage={toggleFullCatalogPackage}
               onRemoveFullCatalogPackage={removeFullCatalogPackage}
             />
           )}

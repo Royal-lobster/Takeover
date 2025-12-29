@@ -16,6 +16,7 @@ interface KitSectionProps {
   selectedApps: Set<string>;
   selectedTokens: Set<string>;
   onToggleApp: (appId: string) => void;
+  onToggleFullCatalogPackage: (token: string) => void;
   onRemoveFullCatalogPackage: (token: string) => void;
 }
 
@@ -27,6 +28,7 @@ export function KitSection({
   selectedApps,
   selectedTokens,
   onToggleApp,
+  onToggleFullCatalogPackage,
   onRemoveFullCatalogPackage,
 }: KitSectionProps) {
   const preselectedApps = APPS.filter((app) => selectedAppIds.includes(app.id));
@@ -77,7 +79,7 @@ export function KitSection({
                   key={pkg.token}
                   package={pkg}
                   isSelected={isSelected}
-                  onToggle={onRemoveFullCatalogPackage}
+                  onToggle={onToggleFullCatalogPackage}
                 />
               );
             })}
