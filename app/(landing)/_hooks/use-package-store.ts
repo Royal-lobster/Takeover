@@ -294,15 +294,3 @@ export function useBrewCommands() {
 }
 
 // --- Actions (stable references) ---
-
-export function usePackageActions() {
-  return {
-    toggleApp: usePackageStore.getState().toggleApp,
-    clearApps: usePackageStore.getState().clearApps,
-    addCustomPackage: usePackageStore.getState().addCustomPackage,
-    removeCustomPackage: usePackageStore.getState().removeCustomPackage,
-    toggleCustomPackage: usePackageStore.getState().toggleCustomPackage,
-    clearAll: usePackageStore.getState().clearAll,
-    initializeFromUrl: usePackageStore.getState().initializeFromUrl,
-  };
-}

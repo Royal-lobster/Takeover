@@ -1,12 +1,11 @@
 "use client";
 
 import { CheckIcon, CopyIcon, ShareNetworkIcon } from "@phosphor-icons/react";
-
+import { useBoolean } from "usehooks-ts";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { useClipboard } from "../_hooks/use-clipboard";
-import { useUninstallMode } from "../_hooks/use-uninstall-mode";
+import { useCopyCommand } from "../_hooks/use-copy-command";
 import { ShareDialog } from "./share-dialog";
 
 interface CommandFooterProps {
@@ -24,9 +23,10 @@ export function CommandFooter({
   selectedApps = [],
   customPackagesCount = 0,
 }: CommandFooterProps) {
-  const { isUninstallMode, toggleMode } = useUninstallMode();
-  const { handleCopy, isCopied } = useClipboard();
+  const uninstallMode = useBoolean(false);
+  const { handleCopy, isCopied } = useCopyCommand();
 
+  const isUninstallMode = uninstallMode.value;
   const displayCommand = isUninstallMode ? uninstallCommand : brewCommand;
   const copied = isCopied(displayCommand);
 
@@ -110,7 +110,7 @@ export function CommandFooter({
               </span>
               <Switch
                 checked={isUninstallMode}
-                onCheckedChange={toggleMode}
+                onCheckedChange={uninstallMode.toggle}
                 aria-label="Toggle uninstall mode"
               />
             </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 import type { AppCategory } from "@/lib/data/schema";
 import { CATEGORIES } from "@/lib/data/schema";
@@ -15,7 +16,6 @@ import {
 } from "./_components/search-results-section";
 import { useFilteredApps } from "./_hooks/use-filtered-apps";
 import { usePackageSelection } from "./_hooks/use-package-selection";
-import { useSearchQuery } from "./_hooks/use-search-query";
 import { useUrlParams } from "./_hooks/use-url-params";
 
 export default function HomePage() {
@@ -46,7 +46,11 @@ export default function HomePage() {
   } = usePackageSelection(initialSelectedAppIds, initialCustomPackages);
 
   // UI state
-  const { searchQuery } = useSearchQuery();
+  const [searchQueryRaw] = useQueryState("search", {
+    defaultValue: "",
+    clearOnDefault: true,
+  });
+  const searchQuery = searchQueryRaw ?? "";
   const [selectedCategory, setSelectedCategory] = useState<AppCategory | "all">(
     "all",
   );

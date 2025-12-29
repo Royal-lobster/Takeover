@@ -5,7 +5,7 @@ import {
   useAnalytics,
 } from "@/app/(landing)/_hooks/use-analytics";
 
-export function useClipboard() {
+export function useCopyCommand() {
   const [, copy] = useCopyToClipboard();
   const [copiedText, setCopiedText] = useState<string>("");
   const { trackCopy } = useAnalytics();

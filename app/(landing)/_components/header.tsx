@@ -8,8 +8,8 @@ import {
   TrashIcon,
   XIcon,
 } from "@phosphor-icons/react";
+import { useQueryState } from "nuqs";
 import type * as React from "react";
-import { useSearchQuery } from "@/app/(landing)/_hooks/use-search-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,10 @@ interface HeaderProps {
 }
 
 export function Header({ selectedCount, onClearAll }: HeaderProps) {
-  const { searchQuery, setSearchQuery } = useSearchQuery();
+  const [searchQuery = "", setSearchQuery] = useQueryState("search", {
+    defaultValue: "",
+    clearOnDefault: true,
+  });
   const hasSelection = selectedCount > 0;
 
   return (
