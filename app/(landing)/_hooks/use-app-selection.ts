@@ -1,27 +1,47 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useIsomorphicLayoutEffect, useLocalStorage } from "usehooks-ts";
 
 export function useAppSelection(initialSelectedIds: string[] = []) {
-  const [selectedApps, setSelectedApps] = useState<Set<string>>(
-    new Set(initialSelectedIds),
+  const [mounted, setMounted] = useState(false);
+  const [selectedAppIds, setSelectedAppIds] = useLocalStorage<string[]>(
+    "installkit-selected-apps",
+    initialSelectedIds,
   );
 
-  const toggleApp = useCallback((appId: string) => {
-    setSelectedApps((prev) => {
-      const next = new Set(prev);
-      if (next.has(appId)) {
-        next.delete(appId);
-      } else {
-        next.add(appId);
-      }
-      return next;
-    });
+  // Use initial values during SSR, localStorage values after hydration
+  const effectiveSelectedIds = mounted ? selectedAppIds : initialSelectedIds;
+
+  const selectedApps = useMemo(
+    () => new Set(effectiveSelectedIds),
+    [effectiveSelectedIds],
+  );
+
+  useIsomorphicLayoutEffect(() => {
+    setMounted(true);
   }, []);
 
+  const toggleApp = useCallback(
+    (appId: string) => {
+      if (!mounted) return; // Don't update during SSR
+      setSelectedAppIds((prev) => {
+        const currentSet = new Set(prev);
+        if (currentSet.has(appId)) {
+          currentSet.delete(appId);
+        } else {
+          currentSet.add(appId);
+        }
+        return Array.from(currentSet);
+      });
+    },
+    [setSelectedAppIds, mounted],
+  );
+
   const clearAll = useCallback(() => {
-    setSelectedApps(new Set());
-  }, []);
+    if (!mounted) return; // Don't update during SSR
+    setSelectedAppIds([]);
+  }, [setSelectedAppIds, mounted]);
 
   return {
     selectedApps,

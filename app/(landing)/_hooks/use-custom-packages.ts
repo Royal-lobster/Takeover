@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useIsomorphicLayoutEffect, useLocalStorage } from "usehooks-ts";
 import type { CustomPackage } from "@/lib/brew-commands";
 
 export function useCustomPackages(
@@ -11,65 +12,97 @@ export function useCustomPackages(
   }> = [],
   sharedTokens: Set<string> = new Set(),
 ) {
-  const [customPackages, setCustomPackages] = useState<
-    Map<string, CustomPackage>
+  const [mounted, setMounted] = useState(false);
+  const [customPackagesArray, setCustomPackagesArray] = useLocalStorage<
+    CustomPackage[]
   >(
-    new Map(
-      initialPackages.map((pkg) => [
-        pkg.token,
-        { token: pkg.token, name: pkg.name, type: pkg.type },
-      ]),
-    ),
+    "installkit-custom-packages",
+    initialPackages.map((pkg) => ({
+      token: pkg.token,
+      name: pkg.name,
+      type: pkg.type,
+    })),
   );
 
-  const [selectedCustomPackages, setSelectedCustomPackages] = useState<
-    Set<string>
-  >(new Set(initialPackages.map((pkg) => pkg.token)));
+  const [selectedCustomPackageIds, setSelectedCustomPackageIds] =
+    useLocalStorage<string[]>(
+      "installkit-selected-custom-packages",
+      initialPackages.map((pkg) => pkg.token),
+    );
 
-  const toggleCustomPackage = useCallback((token: string) => {
-    setSelectedCustomPackages((prev) => {
-      const next = new Set(prev);
-      if (next.has(token)) {
-        next.delete(token);
-      } else {
-        next.add(token);
-      }
-      return next;
-    });
+  // Use initial values during SSR, localStorage values after hydration
+  const effectiveCustomPackages = mounted ? customPackagesArray : initialPackages.map((pkg) => ({
+    token: pkg.token,
+    name: pkg.name,
+    type: pkg.type,
+  }));
+  const effectiveSelectedIds = mounted ? selectedCustomPackageIds : initialPackages.map((pkg) => pkg.token);
+
+  const customPackages = useMemo(
+    () => new Map(effectiveCustomPackages.map((pkg) => [pkg.token, pkg])),
+    [effectiveCustomPackages],
+  );
+
+  const selectedCustomPackages = useMemo(
+    () => new Set(effectiveSelectedIds),
+    [effectiveSelectedIds],
+  );
+
+  useIsomorphicLayoutEffect(() => {
+    setMounted(true);
   }, []);
 
-  const addCustomPackage = useCallback((pkg: CustomPackage) => {
-    setCustomPackages((prev) => {
-      const next = new Map(prev);
-      if (!next.has(pkg.token)) {
-        next.set(pkg.token, pkg);
-      }
-      return next;
-    });
-  }, []);
+  const toggleCustomPackage = useCallback(
+    (token: string) => {
+      if (!mounted) return; // Don't update during SSR
+      setSelectedCustomPackageIds((prev) => {
+        const currentSet = new Set(prev);
+        if (currentSet.has(token)) {
+          currentSet.delete(token);
+        } else {
+          currentSet.add(token);
+        }
+        return Array.from(currentSet);
+      });
+    },
+    [setSelectedCustomPackageIds, mounted],
+  );
+
+  const addCustomPackage = useCallback(
+    (pkg: CustomPackage) => {
+      if (!mounted) return; // Don't update during SSR
+      setCustomPackagesArray((prev) => {
+        const exists = prev.some((p) => p.token === pkg.token);
+        if (!exists) {
+          return [...prev, pkg];
+        }
+        return prev;
+      });
+    },
+    [setCustomPackagesArray, mounted],
+  );
 
   const removeCustomPackage = useCallback(
     (token: string) => {
+      if (!mounted) return; // Don't update during SSR
       if (sharedTokens.has(token)) {
-        setSelectedCustomPackages((prev) => {
-          const next = new Set(prev);
-          next.delete(token);
-          return next;
+        setSelectedCustomPackageIds((prev) => {
+          const currentSet = new Set(prev);
+          currentSet.delete(token);
+          return Array.from(currentSet);
         });
       } else {
-        setCustomPackages((prev) => {
-          const next = new Map(prev);
-          next.delete(token);
-          return next;
-        });
-        setSelectedCustomPackages((prev) => {
-          const next = new Set(prev);
-          next.delete(token);
-          return next;
+        setCustomPackagesArray((prev) =>
+          prev.filter((pkg) => pkg.token !== token),
+        );
+        setSelectedCustomPackageIds((prev) => {
+          const currentSet = new Set(prev);
+          currentSet.delete(token);
+          return Array.from(currentSet);
         });
       }
     },
-    [sharedTokens],
+    [sharedTokens, setCustomPackagesArray, setSelectedCustomPackageIds, mounted],
   );
 
   const selectedCustomPackagesMap = useMemo(() => {
