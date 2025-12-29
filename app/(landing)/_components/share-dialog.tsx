@@ -2,15 +2,18 @@
 
 import { CheckIcon, CopyIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
+import type * as React from "react";
 import { useForm } from "react-hook-form";
 import { useBoolean, useCopyToClipboard } from "usehooks-ts";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -18,13 +21,16 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Toggle } from "@/components/ui/toggle";
+import {
+  useSelectedApps,
+  useSelectedCustomPackages,
+} from "@/lib/hooks/use-package-store";
 import { createShortURL } from "@/lib/integrations/shorturl";
 
 interface ShareDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  selectedAppIds: string[];
-  fullCatalogPackageTokens: string[];
+  children: React.ReactNode;
+  disabled?: boolean;
+  triggerProps?: Omit<React.ComponentProps<typeof DialogTrigger>, "children">;
 }
 
 const MAX_NAME_LENGTH = 60;
@@ -48,11 +54,17 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function ShareDialog({
-  open,
-  onOpenChange,
-  selectedAppIds,
-  fullCatalogPackageTokens,
+  children,
+  disabled,
+  triggerProps,
 }: ShareDialogProps) {
+  // Get selection data from Zustand store
+  const selectedApps = useSelectedApps();
+  const selectedCustomPackages = useSelectedCustomPackages();
+
+  const selectedAppIds = Array.from(selectedApps);
+  const fullCatalogPackageTokens = Array.from(selectedCustomPackages);
+
   const {
     register,
     handleSubmit,
@@ -115,16 +127,19 @@ export function ShareDialog({
     await copy(urlToCopy);
   };
 
-  const handleClose = () => {
+  const handleReset = () => {
     reset();
     generateLink.reset();
     shortUrlMode.setTrue();
-    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog onOpenChange={(open) => !open && handleReset()}>
+      <DialogTrigger disabled={disabled} {...triggerProps}>
+        {children}
+      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
+        <DialogClose />
         <div className="flex flex-col gap-1.5 p-6 pb-0">
           <DialogTitle>Share Installation Kit</DialogTitle>
           <DialogDescription>
@@ -263,9 +278,12 @@ export function ShareDialog({
           <div className="flex justify-end gap-2 pt-2">
             {!isLinkGenerated ? (
               <>
-                <Button type="button" variant="outline" onClick={handleClose}>
+                <DialogClose
+                  type="button"
+                  className={buttonVariants({ variant: "outline" })}
+                >
                   Cancel
-                </Button>
+                </DialogClose>
                 <Button
                   type="submit"
                   disabled={generateLink.isPending}
@@ -282,9 +300,9 @@ export function ShareDialog({
                 </Button>
               </>
             ) : (
-              <Button type="button" onClick={handleClose}>
+              <DialogClose type="button" className={buttonVariants({})}>
                 Done
-              </Button>
+              </DialogClose>
             )}
           </div>
         </form>

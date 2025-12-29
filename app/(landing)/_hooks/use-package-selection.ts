@@ -1,12 +1,19 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { APPS } from "@/lib/data/apps";
 import { useHomebrewCatalogue } from "@/lib/hooks/use-catalogue";
+import {
+  useBrewCommands,
+  useCustomPackages,
+  usePackageStore,
+  useSelectedAppNames,
+  useSelectedApps,
+  useSelectedCount,
+  useSelectedCustomPackages,
+  useSelectedTokens,
+} from "@/lib/hooks/use-package-store";
 import type { SearchResult } from "@/lib/integrations/search";
-import { useAppSelection } from "./use-app-selection";
-import { useBrewCommands } from "./use-brew-commands";
-import { useFullCatalogPackages } from "./use-full-catalog-packages";
 
 interface InitialPackage {
   token: string;
@@ -37,48 +44,56 @@ export function usePackageSelection(
     [resolvedInitialPackages],
   );
 
-  // App selection state
-  const {
-    selectedApps,
-    toggleApp,
-    clearAll: clearApps,
-  } = useAppSelection(initialSelectedAppIds);
+  // Initialize from URL on mount
+  const initializeFromUrl = usePackageStore((state) => state.initializeFromUrl);
+  const hydrated = usePackageStore((state) => state.hydrated);
 
-  // Custom package selection state
-  const {
-    customPackages,
-    selectedCustomPackages,
-    selectedCustomPackagesMap,
-    toggleCustomPackage,
-    addCustomPackage,
-    removeCustomPackage,
-  } = useFullCatalogPackages(resolvedInitialPackages, sharedCustomTokens);
+  useEffect(() => {
+    if (
+      hydrated &&
+      (initialSelectedAppIds.length > 0 || resolvedInitialPackages.length > 0)
+    ) {
+      initializeFromUrl(initialSelectedAppIds, resolvedInitialPackages);
+    }
+  }, [
+    hydrated,
+    initialSelectedAppIds,
+    resolvedInitialPackages,
+    initializeFromUrl,
+  ]);
 
-  // Brew commands derived from selections
-  const { brewCommand, uninstallCommand, selectedTokens } = useBrewCommands(
-    selectedApps,
-    selectedCustomPackagesMap,
+  // Get state from Zustand store
+  const selectedApps = useSelectedApps();
+  const customPackages = useCustomPackages();
+  const selectedCustomPackages = useSelectedCustomPackages();
+  const selectedCount = useSelectedCount();
+  const selectedAppNames = useSelectedAppNames();
+  const selectedTokens = useSelectedTokens();
+  const { brewCommand, uninstallCommand } = useBrewCommands();
+
+  // Get actions from Zustand store
+  const toggleApp = usePackageStore((state) => state.toggleApp);
+  const toggleCustomPackage = usePackageStore(
+    (state) => state.toggleCustomPackage,
+  );
+  const addCustomPackage = usePackageStore((state) => state.addCustomPackage);
+  const removeCustomPackageAction = usePackageStore(
+    (state) => state.removeCustomPackage,
+  );
+  const clearAllAction = usePackageStore((state) => state.clearAll);
+
+  // Wrap removeCustomPackage to include sharedTokens
+  const removeCustomPackage = useCallback(
+    (token: string) => {
+      removeCustomPackageAction(token, sharedCustomTokens);
+    },
+    [removeCustomPackageAction, sharedCustomTokens],
   );
 
-  // Total selection count
-  const selectedCount = selectedApps.size + selectedCustomPackages.size;
-
-  // Extract selected app names for analytics
-  const selectedAppNames = useMemo(() => {
-    return Array.from(selectedApps)
-      .map((appId) => APPS.find((app) => app.id === appId)?.brewName)
-      .filter((name): name is string => Boolean(name));
-  }, [selectedApps]);
-
-  // Clear all selections (respecting shared items from URL)
+  // Wrap clearAll to include sharedTokens
   const clearAll = useCallback(() => {
-    clearApps();
-    for (const token of customPackages.keys()) {
-      if (!sharedCustomTokens.has(token)) {
-        removeCustomPackage(token);
-      }
-    }
-  }, [clearApps, customPackages, sharedCustomTokens, removeCustomPackage]);
+    clearAllAction(sharedCustomTokens);
+  }, [clearAllAction, sharedCustomTokens]);
 
   // Handle selecting a package from search
   const handleSelectPackage = useCallback(

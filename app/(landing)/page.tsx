@@ -13,13 +13,9 @@ import {
   FullCatalogSearchSection,
   SearchResultsSection,
 } from "./_components/search-results-section";
-import { ShareDialog } from "./_components/share-dialog";
-import { SyncDialog } from "./_components/sync-dialog";
 import { useFilteredApps } from "./_hooks/use-filtered-apps";
 import { usePackageSelection } from "./_hooks/use-package-selection";
 import { useSearchQuery } from "./_hooks/use-search-query";
-import { useShareDialog } from "./_hooks/use-share-dialog";
-import { useSyncDialog } from "./_hooks/use-sync-dialog";
 import { useUrlParams } from "./_hooks/use-url-params";
 
 export default function HomePage() {
@@ -55,12 +51,6 @@ export default function HomePage() {
     "all",
   );
 
-  // Dialog state
-  const { isShareDialogOpen, openShareDialog, setShareDialogOpen } =
-    useShareDialog();
-  const { isSyncDialogOpen, openSyncDialog, setSyncDialogOpen } =
-    useSyncDialog();
-
   // Filtered apps based on search and category
   const { filteredApps, appsByCategory, hasSearchQuery } = useFilteredApps(
     searchQuery,
@@ -71,11 +61,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Header
-        selectedCount={selectedCount}
-        onClearAll={clearAll}
-        onSyncClick={openSyncDialog}
-      />
+      <Header selectedCount={selectedCount} onClearAll={clearAll} />
 
       <main className="flex-1 pb-24">
         <div className="border-b border-border">
@@ -120,16 +106,7 @@ export default function HomePage() {
         selectedCount={selectedCount}
         selectedApps={selectedAppNames}
         customPackagesCount={selectedCustomPackages.size}
-        onShare={openShareDialog}
       />
-
-      <ShareDialog
-        open={isShareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-        selectedAppIds={Array.from(selectedApps)}
-        fullCatalogPackageTokens={Array.from(selectedCustomPackages)}
-      />
-      <SyncDialog open={isSyncDialogOpen} onOpenChange={setSyncDialogOpen} />
     </>
   );
 }

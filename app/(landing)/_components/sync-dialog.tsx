@@ -8,6 +8,7 @@ import {
   TerminalWindowIcon,
   UsersIcon,
 } from "@phosphor-icons/react";
+import type * as React from "react";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,12 +19,13 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAnalytics } from "@/lib/hooks/use-analytics";
 
 interface SyncDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+  triggerProps?: Omit<React.ComponentProps<typeof DialogTrigger>, "children">;
 }
 
 const SYNC_COMMAND = "curl -fsSL installkit.app/s | bash";
@@ -46,7 +48,7 @@ const BENEFITS = [
   },
 ];
 
-export function SyncDialog({ open, onOpenChange }: SyncDialogProps) {
+export function SyncDialog({ children, triggerProps }: SyncDialogProps) {
   const [copiedText, copy] = useCopyToClipboard();
   const { trackCopy } = useAnalytics();
   const copied = copiedText === SYNC_COMMAND;
@@ -62,7 +64,8 @@ export function SyncDialog({ open, onOpenChange }: SyncDialogProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog>
+      <DialogTrigger {...triggerProps}>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogClose />
         <DialogHeader className="items-center pt-6 pb-2">

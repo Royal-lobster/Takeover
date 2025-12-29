@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useClipboard } from "../_hooks/use-clipboard";
 import { useUninstallMode } from "../_hooks/use-uninstall-mode";
+import { ShareDialog } from "./share-dialog";
 
 interface CommandFooterProps {
   brewCommand: string;
@@ -14,7 +15,6 @@ interface CommandFooterProps {
   selectedCount: number;
   selectedApps?: string[]; // For analytics
   customPackagesCount?: number; // For analytics
-  onShare?: () => void;
 }
 
 export function CommandFooter({
@@ -23,7 +23,6 @@ export function CommandFooter({
   selectedCount,
   selectedApps = [],
   customPackagesCount = 0,
-  onShare,
 }: CommandFooterProps) {
   const { isUninstallMode, toggleMode } = useUninstallMode();
   const { handleCopy, isCopied } = useClipboard();
@@ -83,20 +82,20 @@ export function CommandFooter({
                 </>
               )}
             </Button>
-            {onShare && (
-              <Button
-                onClick={onShare}
-                disabled={!displayCommand}
-                variant="outline"
-                size="lg"
-                className={cn(
-                  "shrink-0 px-3 py-2.5 shadow-sm transition-all active:scale-95",
+            <ShareDialog
+              disabled={!displayCommand}
+              triggerProps={{
+                className: cn(
+                  "flex items-center justify-center shrink-0 gap-2 rounded-md border border-input bg-background px-3 py-2.5 text-sm font-medium shadow-sm transition-all active:scale-95",
                   controlHeight,
-                )}
-              >
-                <ShareNetworkIcon className="size-4" />
-              </Button>
-            )}
+                  "hover:bg-accent hover:text-accent-foreground",
+                ),
+                type: "button",
+                "aria-label": "Share installation kit",
+              }}
+            >
+              <ShareNetworkIcon className="size-4" />
+            </ShareDialog>
           </div>
 
           <div className="flex items-center justify-between gap-3 text-muted-foreground/80">

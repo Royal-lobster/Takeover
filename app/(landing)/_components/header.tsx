@@ -13,18 +13,14 @@ import { useSearchQuery } from "@/app/(landing)/_hooks/use-search-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { SyncDialog } from "./sync-dialog";
 
 interface HeaderProps {
   selectedCount: number;
   onClearAll: () => void;
-  onSyncClick: () => void;
 }
 
-export function Header({
-  selectedCount,
-  onClearAll,
-  onSyncClick,
-}: HeaderProps) {
+export function Header({ selectedCount, onClearAll }: HeaderProps) {
   const { searchQuery, setSearchQuery } = useSearchQuery();
   const hasSelection = selectedCount > 0;
 
@@ -83,15 +79,19 @@ export function Header({
 
           {/* Right: Actions */}
           <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={onSyncClick}
-              className="flex h-8 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label="Sync existing Homebrew setup"
+            <SyncDialog
+              triggerProps={{
+                className:
+                  "flex h-8 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                "aria-label": "Sync existing Homebrew setup",
+                type: "button",
+              }}
             >
-              <CloudArrowUpIcon className="size-4" weight="bold" />
-              <span>Sync</span>
-            </button>
+              <>
+                <CloudArrowUpIcon className="size-4" weight="bold" />
+                <span>Sync</span>
+              </>
+            </SyncDialog>
             <a
               href="https://github.com/Royal-lobster/InstallKit"
               target="_blank"
@@ -149,14 +149,16 @@ export function Header({
                 <span>{selectedCount} selected</span>
                 <XIcon className="size-3" weight="bold" />
               </button>
-              <button
-                type="button"
-                onClick={onSyncClick}
-                className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                aria-label="Sync existing Homebrew setup"
+              <SyncDialog
+                triggerProps={{
+                  className:
+                    "flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                  "aria-label": "Sync existing Homebrew setup",
+                  type: "button",
+                }}
               >
                 <CloudArrowUpIcon className="size-4" weight="bold" />
-              </button>
+              </SyncDialog>
               <a
                 href="https://github.com/Royal-lobster/InstallKit"
                 target="_blank"
