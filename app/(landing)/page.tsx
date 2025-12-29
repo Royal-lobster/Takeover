@@ -9,7 +9,7 @@ import { Categories } from "./_components/categories";
 import { CommandFooter } from "./_components/command-footer";
 import { FullCatalogPackagesSection } from "./_components/full-catalog-package";
 import { Header } from "./_components/header";
-import { KitHeader } from "./_components/kit-header";
+import { KitSection } from "./_components/kit-section";
 import {
   FullCatalogSearchSection,
   SearchResultsSection,
@@ -79,7 +79,18 @@ export default function HomePage() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 py-4">
-          {kitName && <KitHeader name={kitName} description={kitDescription} />}
+          {kitName && (
+            <KitSection
+              name={kitName}
+              description={kitDescription}
+              selectedAppIds={initialSelectedAppIds}
+              fullCatalogPackages={initialFullCatalogPackages}
+              selectedApps={selectedApps}
+              selectedTokens={selectedTokens}
+              onToggleApp={toggleApp}
+              onRemoveFullCatalogPackage={removeFullCatalogPackage}
+            />
+          )}
 
           <FullCatalogPackagesSection
             packages={fullCatalogPackages}
