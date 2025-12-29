@@ -1,40 +1,38 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import { type SearchResult, searchHomebrewCatalogue } from "../_actions";
+import {
+  type SearchResult,
+  useHomebrewCatalogue,
+} from "@/lib/homebrew-catalogue";
 
-export const homebrewSearchKeys = {
-  all: ["homebrew-search"] as const,
-  search: (query: string) => [...homebrewSearchKeys.all, query] as const,
-};
+export type { SearchResult };
 
 export function useHomebrewSearch(query: string) {
-  const [debouncedQuery] = useDebounceValue(query, 300);
+  const [debouncedQuery] = useDebounceValue(query, 150); // Faster debounce for client-side search
+  const { search, isReady, isLoading, error } = useHomebrewCatalogue();
 
-  const { data, isLoading, error, isFetching } = useQuery<
-    SearchResult[],
-    Error
-  >({
-    queryKey: homebrewSearchKeys.search(debouncedQuery),
-    queryFn: () => searchHomebrewCatalogue(debouncedQuery),
-    enabled: debouncedQuery.trim().length >= 2,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
-  });
+  const results = useMemo(() => {
+    if (!isReady || debouncedQuery.trim().length < 2) {
+      return [];
+    }
+    return search(debouncedQuery, 50);
+  }, [debouncedQuery, isReady, search]);
 
-  // Show loading indicator while typing or fetching initial results
-  const isSearching =
-    query !== debouncedQuery || ((isLoading || isFetching) && !data);
+  // Show loading indicator while:
+  // 1. Typing (query doesn't match debounced yet)
+  // 2. Catalogue is still loading initially
+  const isSearching = query !== debouncedQuery || (isLoading && !isReady);
 
   return useMemo(
     () => ({
-      results: data ?? [],
+      results,
       isSearching,
+      isCatalogueReady: isReady,
       error,
       query: debouncedQuery,
     }),
-    [data, isSearching, error, debouncedQuery],
+    [results, isSearching, isReady, error, debouncedQuery],
   );
 }

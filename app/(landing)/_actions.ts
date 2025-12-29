@@ -1,12 +1,11 @@
 "use server";
 
-import Fuse from "fuse.js";
 import {
   unstable_cacheLife as cacheLife,
   unstable_cacheTag as cacheTag,
 } from "next/cache";
 
-export type HomebrewPackage = {
+type HomebrewPackage = {
   token: string;
   name: string | string[];
   desc: string;
@@ -86,51 +85,10 @@ async function getCatalogue(): Promise<HomebrewPackage[]> {
   return [...casks, ...formulae];
 }
 
-export type SearchResult = {
-  token: string;
-  name: string;
-  desc: string;
-  homepage: string;
-  version: string;
-  type: "cask" | "formula";
-};
-
-export async function searchHomebrewCatalogue(
-  query: string,
-): Promise<SearchResult[]> {
-  if (!query || query.trim().length < 2) {
-    return [];
-  }
-
-  const catalogue = await getCatalogue();
-
-  const fuse = new Fuse(catalogue, {
-    keys: [
-      { name: "token", weight: 0.4 },
-      { name: "name", weight: 0.4 },
-      { name: "desc", weight: 0.2 },
-    ],
-    threshold: 0.5,
-    ignoreLocation: true,
-    includeScore: true,
-    useExtendedSearch: true,
-    minMatchCharLength: 2,
-  });
-
-  const results = fuse.search(query.trim(), { limit: 50 });
-
-  return results.map((result) => ({
-    token: result.item.token,
-    name: Array.isArray(result.item.name)
-      ? result.item.name[0]
-      : result.item.name,
-    desc: result.item.desc,
-    homepage: result.item.homepage,
-    version: result.item.version,
-    type: result.item.type,
-  }));
-}
-
+/**
+ * Lookup package types for shared links (server-side only).
+ * This is needed for SSR when loading shared links with custom packages.
+ */
 export async function lookupPackageTypes(
   tokens: string[],
 ): Promise<Map<string, "cask" | "formula">> {

@@ -1,19 +1,52 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import type { HomebrewInfo } from "@/lib/api/homebrew";
-import { fetchHomebrewInfo } from "@/lib/api/homebrew";
+import { useMemo } from "react";
+import { useHomebrewCatalogue } from "@/lib/homebrew-catalogue";
 
-export const homebrewInfoKeys = {
-  all: ["homebrew-info"] as const,
-  detail: (brewName: string) => [...homebrewInfoKeys.all, brewName] as const,
+export type HomebrewInfo = {
+  name?: string;
+  description?: string;
+  homepage?: string;
+  version?: string;
+  url?: string;
+  kind: "cask" | "formula";
 };
 
 export function useHomebrewInfo(brewName: string, enabled = false) {
-  return useQuery<HomebrewInfo, Error>({
-    queryKey: homebrewInfoKeys.detail(brewName),
-    queryFn: () => fetchHomebrewInfo(brewName),
-    enabled,
-    staleTime: Infinity,
-  });
+  const { getPackage, isReady } = useHomebrewCatalogue();
+
+  return useMemo(() => {
+    if (!enabled || !isReady) {
+      return {
+        data: undefined,
+        isLoading: !isReady && enabled,
+        error: null,
+      };
+    }
+
+    const pkg = getPackage(brewName);
+
+    if (!pkg) {
+      return {
+        data: undefined,
+        isLoading: false,
+        error: null,
+      };
+    }
+
+    const data: HomebrewInfo = {
+      name: Array.isArray(pkg.name) ? pkg.name[0] : pkg.name,
+      description: pkg.desc,
+      homepage: pkg.homepage,
+      version: pkg.version,
+      url: `https://formulae.brew.sh/${pkg.type}/${pkg.token}`,
+      kind: pkg.type,
+    };
+
+    return {
+      data,
+      isLoading: false,
+      error: null,
+    };
+  }, [brewName, enabled, isReady, getPackage]);
 }

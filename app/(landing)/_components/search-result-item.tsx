@@ -8,7 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CommandItem } from "@/components/ui/command";
-import type { SearchResult } from "../_actions";
+import type { SearchResult } from "@/lib/homebrew-catalogue";
 
 interface SearchResultItemProps {
   pkg: SearchResult;

@@ -10,10 +10,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { HomebrewInfo } from "@/lib/api/homebrew";
 import { generateBrewCommand, getHomebrewUrl } from "@/lib/brew-commands";
 import type { App } from "@/lib/schema";
-import { useHomebrewInfo } from "../_hooks/use-homebrew-info";
+import {
+  type HomebrewInfo,
+  useHomebrewInfo,
+} from "../_hooks/use-homebrew-info";
 import { AppIcon } from "./app-icon";
 
 interface AppInfoPopoverProps {
