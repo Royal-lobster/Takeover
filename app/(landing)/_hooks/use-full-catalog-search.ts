@@ -2,11 +2,11 @@
 
 import { useMemo } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import { useFullCatalogue } from "@/app/(landing)/_hooks/use-full-catalogue";
+import { useFullCatalog } from "@/app/(landing)/_hooks/use-full-catalog";
 
 export function useFullCatalogSearch(query: string) {
   const [debouncedQuery] = useDebounceValue(query, 150); // Faster debounce for client-side search
-  const { search, isReady, isLoading, error } = useFullCatalogue();
+  const { search, isReady, isLoading, error } = useFullCatalog();
 
   const results = useMemo(() => {
     if (!isReady || debouncedQuery.trim().length < 2) {
@@ -17,14 +17,14 @@ export function useFullCatalogSearch(query: string) {
 
   // Show loading indicator while:
   // 1. Typing (query doesn't match debounced yet)
-  // 2. Catalogue is still loading initially
+  // 2. Catalog is still loading initially
   const isSearching = query !== debouncedQuery || (isLoading && !isReady);
 
   return useMemo(
     () => ({
       results,
       isSearching,
-      isCatalogueReady: isReady,
+      isCatalogReady: isReady,
       error,
       query: debouncedQuery,
     }),

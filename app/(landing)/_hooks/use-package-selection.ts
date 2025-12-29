@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo } from "react";
-import { useFullCatalogue } from "@/app/(landing)/_hooks/use-full-catalogue";
+import { useFullCatalog } from "@/app/(landing)/_hooks/use-full-catalog";
 import {
   useBrewCommands,
-  useCustomPackages,
+  useFullCatalogPackages,
   usePackageStore,
   useSelectedAppNames,
   useSelectedApps,
   useSelectedCount,
-  useSelectedCustomPackages,
+  useSelectedFullCatalogPackages,
   useSelectedTokens,
 } from "@/app/(landing)/_hooks/use-package-store";
 import { APPS } from "@/lib/data/apps";
@@ -23,23 +23,23 @@ interface InitialPackage {
 
 export function usePackageSelection(
   initialSelectedAppIds: string[],
-  initialCustomPackages: InitialPackage[],
+  initialFullCatalogPackages: InitialPackage[],
 ) {
-  const { getPackage } = useFullCatalogue();
+  const { getPackage } = useFullCatalog();
 
-  // Resolve package types for initial custom packages
+  // Resolve package types for initial full catalog packages
   const resolvedInitialPackages = useMemo(() => {
-    return initialCustomPackages.map((pkg) => {
-      const cataloguePackage = getPackage(pkg.token);
+    return initialFullCatalogPackages.map((pkg) => {
+      const catalogPackage = getPackage(pkg.token);
       return {
         ...pkg,
-        type: cataloguePackage?.type || pkg.type,
+        type: catalogPackage?.type || pkg.type,
       };
     });
-  }, [initialCustomPackages, getPackage]);
+  }, [initialFullCatalogPackages, getPackage]);
 
   // Shared tokens that came from URL
-  const sharedCustomTokens = useMemo(
+  const sharedFullCatalogTokens = useMemo(
     () => new Set(resolvedInitialPackages.map((pkg) => pkg.token)),
     [resolvedInitialPackages],
   );
@@ -64,8 +64,8 @@ export function usePackageSelection(
 
   // Get state from Zustand store
   const selectedApps = useSelectedApps();
-  const customPackages = useCustomPackages();
-  const selectedCustomPackages = useSelectedCustomPackages();
+  const fullCatalogPackages = useFullCatalogPackages();
+  const selectedFullCatalogPackages = useSelectedFullCatalogPackages();
   const selectedCount = useSelectedCount();
   const selectedAppNames = useSelectedAppNames();
   const selectedTokens = useSelectedTokens();
@@ -73,27 +73,29 @@ export function usePackageSelection(
 
   // Get actions from Zustand store
   const toggleApp = usePackageStore((state) => state.toggleApp);
-  const toggleCustomPackage = usePackageStore(
-    (state) => state.toggleCustomPackage,
+  const toggleFullCatalogPackage = usePackageStore(
+    (state) => state.toggleFullCatalogPackage,
   );
-  const addCustomPackage = usePackageStore((state) => state.addCustomPackage);
-  const removeCustomPackageAction = usePackageStore(
-    (state) => state.removeCustomPackage,
+  const addFullCatalogPackage = usePackageStore(
+    (state) => state.addFullCatalogPackage,
+  );
+  const removeFullCatalogPackageAction = usePackageStore(
+    (state) => state.removeFullCatalogPackage,
   );
   const clearAllAction = usePackageStore((state) => state.clearAll);
 
-  // Wrap removeCustomPackage to include sharedTokens
-  const removeCustomPackage = useCallback(
+  // Wrap removeFullCatalogPackage to include sharedTokens
+  const removeFullCatalogPackage = useCallback(
     (token: string) => {
-      removeCustomPackageAction(token, sharedCustomTokens);
+      removeFullCatalogPackageAction(token, sharedFullCatalogTokens);
     },
-    [removeCustomPackageAction, sharedCustomTokens],
+    [removeFullCatalogPackageAction, sharedFullCatalogTokens],
   );
 
   // Wrap clearAll to include sharedTokens
   const clearAll = useCallback(() => {
-    clearAllAction(sharedCustomTokens);
-  }, [clearAllAction, sharedCustomTokens]);
+    clearAllAction(sharedFullCatalogTokens);
+  }, [clearAllAction, sharedFullCatalogTokens]);
 
   // Handle selecting a package from search
   const handleSelectPackage = useCallback(
@@ -105,19 +107,19 @@ export function usePackageSelection(
         return;
       }
 
-      // Resolve type from catalogue if available
-      const cataloguePackage = getPackage(pkg.token);
-      const resolvedType = cataloguePackage?.type || pkg.type;
+      // Resolve type from catalog if available
+      const catalogPackage = getPackage(pkg.token);
+      const resolvedType = catalogPackage?.type || pkg.type;
 
-      addCustomPackage({
+      addFullCatalogPackage({
         token: pkg.token,
         name: pkg.name,
         type: resolvedType,
       });
 
-      toggleCustomPackage(pkg.token);
+      toggleFullCatalogPackage(pkg.token);
     },
-    [toggleApp, addCustomPackage, toggleCustomPackage, getPackage],
+    [toggleApp, addFullCatalogPackage, toggleFullCatalogPackage, getPackage],
   );
 
   return {
@@ -125,12 +127,12 @@ export function usePackageSelection(
     selectedApps,
     toggleApp,
 
-    // Custom package selection
-    customPackages,
-    selectedCustomPackages,
-    sharedCustomTokens,
-    toggleCustomPackage,
-    removeCustomPackage,
+    // Full catalog package selection
+    fullCatalogPackages,
+    selectedFullCatalogPackages,
+    sharedFullCatalogTokens,
+    toggleFullCatalogPackage,
+    removeFullCatalogPackage,
     handleSelectPackage,
 
     // Derived values

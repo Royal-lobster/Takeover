@@ -42,21 +42,21 @@ type RawCask = {
   version: string;
 };
 
-export type CatalogueState = {
+export type CatalogState = {
   isLoading: boolean;
   isReady: boolean;
   error: Error | null;
   packageCount: number;
 };
 
-type CatalogueStore = {
-  state: CatalogueState;
+type CatalogStore = {
+  state: CatalogState;
   listeners: Set<() => void>;
   initPromise: Promise<void> | null;
 };
 
 // Global store to share state across all hook instances
-const store: CatalogueStore = {
+const store: CatalogStore = {
   state: {
     isLoading: false,
     isReady: false,
@@ -71,17 +71,17 @@ const store: CatalogueStore = {
 let isInitialized = false;
 
 /**
- * Hook to manage the Homebrew catalogue.
+ * Hook to manage the Homebrew full catalog.
  *
  * This hook:
- * - Loads catalogue from IndexedDB on mount (after page load)
+ * - Loads catalog from IndexedDB on mount (after page load)
  * - Fetches fresh data if cache is stale or missing
  * - Provides search functionality
  * - Provides package lookup by token
  *
  * All state is shared across hook instances.
  */
-export function useFullCatalogue() {
+export function useFullCatalog() {
   const [state, setState] = useState(store.state);
   const hasInitialized = useRef(false);
 
@@ -90,7 +90,7 @@ export function useFullCatalogue() {
     const listener = () => setState(store.state);
     store.listeners.add(listener);
 
-    // Initialize catalogue after page load (using requestIdleCallback if available)
+    // Initialize catalog after page load (using requestIdleCallback if available)
     if (!hasInitialized.current && !store.initPromise && !isInitialized) {
       hasInitialized.current = true;
       isInitialized = true;
@@ -98,7 +98,7 @@ export function useFullCatalogue() {
       const init = () => {
         // Double-check we haven't already started initialization
         if (!store.initPromise) {
-          store.initPromise = initializeCatalogue();
+          store.initPromise = initializeCatalog();
         }
       };
 
@@ -156,14 +156,14 @@ export function useFullCatalogue() {
   };
 }
 
-function updateState(partial: Partial<CatalogueState>) {
+function updateState(partial: Partial<CatalogState>) {
   store.state = { ...store.state, ...partial };
   for (const listener of store.listeners) {
     listener();
   }
 }
 
-async function fetchCatalogue(): Promise<HomebrewPackage[]> {
+async function fetchCatalog(): Promise<HomebrewPackage[]> {
   const [formulaeRes, casksRes] = await Promise.all([
     fetch(FORMULAE_URL),
     fetch(CASKS_URL),
@@ -215,7 +215,7 @@ async function fetchCatalogue(): Promise<HomebrewPackage[]> {
   return packages;
 }
 
-async function initializeCatalogue(): Promise<void> {
+async function initializeCatalog(): Promise<void> {
   // Check if we already have data in IndexedDB
   const [hasCachedData, lastUpdated] = await Promise.all([
     hasPackages(),
@@ -247,7 +247,7 @@ async function initializeCatalogue(): Promise<void> {
     });
 
     // Background refresh
-    refreshCatalogueInBackground();
+    refreshCatalogInBackground();
     return;
   }
 
@@ -255,7 +255,7 @@ async function initializeCatalogue(): Promise<void> {
   updateState({ isLoading: true });
 
   try {
-    const packages = await fetchCatalogue();
+    const packages = await fetchCatalog();
     await savePackages(packages);
     createSearchIndex(packages);
     updateState({
@@ -267,19 +267,19 @@ async function initializeCatalogue(): Promise<void> {
     updateState({
       isLoading: false,
       error:
-        error instanceof Error ? error : new Error("Failed to load catalogue"),
+        error instanceof Error ? error : new Error("Failed to load catalog"),
     });
   }
 }
 
-async function refreshCatalogueInBackground(): Promise<void> {
+async function refreshCatalogInBackground(): Promise<void> {
   try {
-    const packages = await fetchCatalogue();
+    const packages = await fetchCatalog();
     await savePackages(packages);
     createSearchIndex(packages);
     updateState({ packageCount: packages.length });
   } catch {
     // Silently fail background refresh - we already have data
-    console.warn("Background catalogue refresh failed");
+    console.warn("Background catalog refresh failed");
   }
 }

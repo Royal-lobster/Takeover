@@ -1,7 +1,7 @@
 import { APPS } from "@/lib/data/apps";
 import type { App } from "@/lib/data/schema";
 
-export interface CustomPackage {
+export interface FullCatalogPackage {
   token: string;
   name: string;
   type: "cask" | "formula";
@@ -18,10 +18,10 @@ export function generateBrewCommand(
 
 export function generateBulkBrewCommand(
   appIds: string[],
-  customPackages: Map<string, CustomPackage>,
+  fullCatalogPackages: Map<string, FullCatalogPackage>,
   mode: "install" | "uninstall" = "install",
 ): string {
-  if (appIds.length === 0 && customPackages.size === 0) return "";
+  if (appIds.length === 0 && fullCatalogPackages.size === 0) return "";
 
   const apps = appIds
     .map((id) => APPS.find((app) => app.id === id))
@@ -38,7 +38,7 @@ export function generateBulkBrewCommand(
     }
   }
 
-  for (const pkg of customPackages.values()) {
+  for (const pkg of fullCatalogPackages.values()) {
     if (pkg.type === "cask") {
       allCasks.push(pkg.token);
     } else {

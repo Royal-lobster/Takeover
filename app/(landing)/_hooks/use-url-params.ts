@@ -8,7 +8,7 @@ export interface UrlParams {
   kitName: string | undefined;
   kitDescription: string | undefined;
   initialSelectedAppIds: string[];
-  initialCustomPackages: Array<{
+  initialFullCatalogPackages: Array<{
     token: string;
     name: string;
     type: "cask" | "formula";
@@ -40,7 +40,7 @@ export function useUrlParams(): UrlParams {
       }
     }
 
-    const initialCustomPackages = externalTokens.map((token) => ({
+    const initialFullCatalogPackages = externalTokens.map((token) => ({
       token,
       name: token,
       type: "cask" as const,
@@ -50,7 +50,7 @@ export function useUrlParams(): UrlParams {
       kitName,
       kitDescription,
       initialSelectedAppIds: selectedAppIds,
-      initialCustomPackages,
+      initialFullCatalogPackages,
     };
   }, [params]);
 }

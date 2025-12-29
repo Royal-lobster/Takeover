@@ -24,18 +24,18 @@ export default function HomePage() {
     kitName,
     kitDescription,
     initialSelectedAppIds,
-    initialCustomPackages,
+    initialFullCatalogPackages,
   } = useUrlParams();
 
-  // Package selection state (apps + custom packages)
+  // Package selection state (apps + full catalog packages)
   const {
     selectedApps,
     toggleApp,
-    customPackages,
-    selectedCustomPackages,
-    sharedCustomTokens,
-    toggleCustomPackage,
-    removeCustomPackage,
+    fullCatalogPackages,
+    selectedFullCatalogPackages,
+    sharedFullCatalogTokens,
+    toggleFullCatalogPackage,
+    removeFullCatalogPackage,
     handleSelectPackage,
     selectedCount,
     selectedAppNames,
@@ -43,7 +43,7 @@ export default function HomePage() {
     brewCommand,
     uninstallCommand,
     clearAll,
-  } = usePackageSelection(initialSelectedAppIds, initialCustomPackages);
+  } = usePackageSelection(initialSelectedAppIds, initialFullCatalogPackages);
 
   // UI state
   const [searchQueryRaw] = useQueryState("search", {
@@ -82,11 +82,11 @@ export default function HomePage() {
           {kitName && <KitHeader name={kitName} description={kitDescription} />}
 
           <FullCatalogPackagesSection
-            packages={customPackages}
-            selectedTokens={selectedCustomPackages}
-            sharedTokens={sharedCustomTokens}
-            onToggle={toggleCustomPackage}
-            onRemove={removeCustomPackage}
+            packages={fullCatalogPackages}
+            selectedTokens={selectedFullCatalogPackages}
+            sharedTokens={sharedFullCatalogTokens}
+            onToggle={toggleFullCatalogPackage}
+            onRemove={removeFullCatalogPackage}
             showCheckbox={true}
           />
 
@@ -109,7 +109,7 @@ export default function HomePage() {
         uninstallCommand={uninstallCommand}
         selectedCount={selectedCount}
         selectedApps={selectedAppNames}
-        customPackagesCount={selectedCustomPackages.size}
+        fullCatalogPackagesCount={selectedFullCatalogPackages.size}
       />
     </>
   );

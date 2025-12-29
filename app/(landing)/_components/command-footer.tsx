@@ -13,7 +13,7 @@ interface CommandFooterProps {
   uninstallCommand: string;
   selectedCount: number;
   selectedApps?: string[]; // For analytics
-  customPackagesCount?: number; // For analytics
+  fullCatalogPackagesCount?: number; // For analytics
 }
 
 export function CommandFooter({
@@ -21,7 +21,7 @@ export function CommandFooter({
   uninstallCommand,
   selectedCount,
   selectedApps = [],
-  customPackagesCount = 0,
+  fullCatalogPackagesCount = 0,
 }: CommandFooterProps) {
   const uninstallMode = useBoolean(false);
   const { handleCopy, isCopied } = useCopyCommand();
@@ -34,8 +34,8 @@ export function CommandFooter({
     handleCopy(displayCommand, {
       type: "brew_command",
       command: displayCommand,
-      selectedAppsCount: selectedCount - customPackagesCount,
-      customPackagesCount,
+      selectedAppsCount: selectedCount - fullCatalogPackagesCount,
+      fullCatalogPackagesCount,
       isUninstallMode,
       selectedApps,
     });

@@ -3,12 +3,12 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { APPS } from "@/lib/data/apps";
-import type { CustomPackage } from "@/lib/helpers/brew-commands";
+import type { FullCatalogPackage } from "@/lib/helpers/brew-commands";
 import { generateBulkBrewCommand } from "@/lib/helpers/brew-commands";
 
 // --- Types ---
 
-interface CustomPackageInput {
+interface FullCatalogPackageInput {
   token: string;
   name: string;
   type: "cask" | "formula";
@@ -17,21 +17,21 @@ interface CustomPackageInput {
 interface PackageSelectionState {
   // State
   selectedAppIds: string[];
-  customPackages: CustomPackage[];
-  selectedCustomPackageIds: string[];
+  fullCatalogPackages: FullCatalogPackage[];
+  selectedFullCatalogPackageIds: string[];
   hydrated: boolean;
 
   // Actions
   toggleApp: (appId: string) => void;
   clearApps: () => void;
-  addCustomPackage: (pkg: CustomPackageInput) => void;
-  removeCustomPackage: (token: string, sharedTokens?: Set<string>) => void;
-  toggleCustomPackage: (token: string) => void;
+  addFullCatalogPackage: (pkg: FullCatalogPackageInput) => void;
+  removeFullCatalogPackage: (token: string, sharedTokens?: Set<string>) => void;
+  toggleFullCatalogPackage: (token: string) => void;
   clearAll: (sharedTokens?: Set<string>) => void;
   setHydrated: () => void;
   initializeFromUrl: (
     appIds: string[],
-    customPkgs: CustomPackageInput[],
+    fullCatalogPkgs: FullCatalogPackageInput[],
   ) => void;
 }
 
@@ -42,8 +42,8 @@ export const usePackageStore = create<PackageSelectionState>()(
     (set) => ({
       // Initial state
       selectedAppIds: [],
-      customPackages: [],
-      selectedCustomPackageIds: [],
+      fullCatalogPackages: [],
+      selectedFullCatalogPackageIds: [],
       hydrated: false,
 
       // Actions
@@ -63,63 +63,65 @@ export const usePackageStore = create<PackageSelectionState>()(
         set({ selectedAppIds: [] });
       },
 
-      addCustomPackage: (pkg: CustomPackageInput) => {
+      addFullCatalogPackage: (pkg: FullCatalogPackageInput) => {
         set((state) => {
-          const exists = state.customPackages.some(
+          const exists = state.fullCatalogPackages.some(
             (p) => p.token === pkg.token,
           );
           if (exists) return state;
           return {
-            customPackages: [...state.customPackages, pkg],
+            fullCatalogPackages: [...state.fullCatalogPackages, pkg],
           };
         });
       },
 
-      removeCustomPackage: (token: string, sharedTokens?: Set<string>) => {
+      removeFullCatalogPackage: (token: string, sharedTokens?: Set<string>) => {
         set((state) => {
           // If it's a shared token (from URL), only deselect, don't remove
           if (sharedTokens?.has(token)) {
             return {
-              selectedCustomPackageIds: state.selectedCustomPackageIds.filter(
-                (id) => id !== token,
-              ),
+              selectedFullCatalogPackageIds:
+                state.selectedFullCatalogPackageIds.filter(
+                  (id) => id !== token,
+                ),
             };
           }
           // Otherwise, remove the package entirely
           return {
-            customPackages: state.customPackages.filter(
+            fullCatalogPackages: state.fullCatalogPackages.filter(
               (pkg) => pkg.token !== token,
             ),
-            selectedCustomPackageIds: state.selectedCustomPackageIds.filter(
-              (id) => id !== token,
-            ),
+            selectedFullCatalogPackageIds:
+              state.selectedFullCatalogPackageIds.filter((id) => id !== token),
           };
         });
       },
 
-      toggleCustomPackage: (token: string) => {
+      toggleFullCatalogPackage: (token: string) => {
         set((state) => {
-          const ids = new Set(state.selectedCustomPackageIds);
+          const ids = new Set(state.selectedFullCatalogPackageIds);
           if (ids.has(token)) {
             ids.delete(token);
           } else {
             ids.add(token);
           }
-          return { selectedCustomPackageIds: Array.from(ids) };
+          return { selectedFullCatalogPackageIds: Array.from(ids) };
         });
       },
 
       clearAll: (sharedTokens?: Set<string>) => {
         set((state) => {
-          // Keep shared custom packages but deselect them
+          // Keep shared full catalog packages but deselect them
           const filteredPackages = sharedTokens
-            ? state.customPackages.filter((pkg) => sharedTokens.has(pkg.token))
+            ? state.fullCatalogPackages.filter((pkg) =>
+                sharedTokens.has(pkg.token),
+              )
             : [];
 
           return {
             selectedAppIds: [],
-            customPackages: filteredPackages,
-            selectedCustomPackageIds: [],
+            fullCatalogPackages: filteredPackages,
+            selectedFullCatalogPackageIds: [],
           };
         });
       },
@@ -130,14 +132,14 @@ export const usePackageStore = create<PackageSelectionState>()(
 
       initializeFromUrl: (
         appIds: string[],
-        customPkgs: CustomPackageInput[],
+        fullCatalogPkgs: FullCatalogPackageInput[],
       ) => {
         set((state) => {
           // Merge URL packages with existing, avoiding duplicates
           const existingTokens = new Set(
-            state.customPackages.map((p) => p.token),
+            state.fullCatalogPackages.map((p) => p.token),
           );
-          const newPackages = customPkgs.filter(
+          const newPackages = fullCatalogPkgs.filter(
             (pkg) => !existingTokens.has(pkg.token),
           );
 
@@ -145,17 +147,19 @@ export const usePackageStore = create<PackageSelectionState>()(
           const existingAppIds = new Set(state.selectedAppIds);
           const newAppIds = appIds.filter((id) => !existingAppIds.has(id));
 
-          // Merge selected custom package IDs
-          const existingSelectedIds = new Set(state.selectedCustomPackageIds);
-          const newSelectedIds = customPkgs
+          // Merge selected full catalog package IDs
+          const existingSelectedIds = new Set(
+            state.selectedFullCatalogPackageIds,
+          );
+          const newSelectedIds = fullCatalogPkgs
             .map((p) => p.token)
             .filter((id) => !existingSelectedIds.has(id));
 
           return {
             selectedAppIds: [...state.selectedAppIds, ...newAppIds],
-            customPackages: [...state.customPackages, ...newPackages],
-            selectedCustomPackageIds: [
-              ...state.selectedCustomPackageIds,
+            fullCatalogPackages: [...state.fullCatalogPackages, ...newPackages],
+            selectedFullCatalogPackageIds: [
+              ...state.selectedFullCatalogPackageIds,
               ...newSelectedIds,
             ],
           };
@@ -167,8 +171,8 @@ export const usePackageStore = create<PackageSelectionState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         selectedAppIds: state.selectedAppIds,
-        customPackages: state.customPackages,
-        selectedCustomPackageIds: state.selectedCustomPackageIds,
+        fullCatalogPackages: state.fullCatalogPackages,
+        selectedFullCatalogPackageIds: state.selectedFullCatalogPackageIds,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated();
@@ -188,37 +192,41 @@ export function useSelectedApps() {
   return new Set(selectedAppIds);
 }
 
-export function useCustomPackages() {
-  const customPackages = usePackageStore((state) => state.customPackages);
+export function useFullCatalogPackages() {
+  const fullCatalogPackages = usePackageStore(
+    (state) => state.fullCatalogPackages,
+  );
   const hydrated = usePackageStore((state) => state.hydrated);
 
-  if (!hydrated) return new Map<string, CustomPackage>();
-  return new Map(customPackages.map((pkg) => [pkg.token, pkg]));
+  if (!hydrated) return new Map<string, FullCatalogPackage>();
+  return new Map(fullCatalogPackages.map((pkg) => [pkg.token, pkg]));
 }
 
-export function useSelectedCustomPackages() {
-  const selectedCustomPackageIds = usePackageStore(
-    (state) => state.selectedCustomPackageIds,
+export function useSelectedFullCatalogPackages() {
+  const selectedFullCatalogPackageIds = usePackageStore(
+    (state) => state.selectedFullCatalogPackageIds,
   );
   const hydrated = usePackageStore((state) => state.hydrated);
 
   if (!hydrated) return new Set<string>();
-  return new Set(selectedCustomPackageIds);
+  return new Set(selectedFullCatalogPackageIds);
 }
 
-export function useSelectedCustomPackagesMap() {
-  const customPackages = usePackageStore((state) => state.customPackages);
-  const selectedCustomPackageIds = usePackageStore(
-    (state) => state.selectedCustomPackageIds,
+export function useSelectedFullCatalogPackagesMap() {
+  const fullCatalogPackages = usePackageStore(
+    (state) => state.fullCatalogPackages,
+  );
+  const selectedFullCatalogPackageIds = usePackageStore(
+    (state) => state.selectedFullCatalogPackageIds,
   );
   const hydrated = usePackageStore((state) => state.hydrated);
 
-  if (!hydrated) return new Map<string, CustomPackage>();
+  if (!hydrated) return new Map<string, FullCatalogPackage>();
 
-  const selectedSet = new Set(selectedCustomPackageIds);
-  const map = new Map<string, CustomPackage>();
+  const selectedSet = new Set(selectedFullCatalogPackageIds);
+  const map = new Map<string, FullCatalogPackage>();
 
-  for (const pkg of customPackages) {
+  for (const pkg of fullCatalogPackages) {
     if (selectedSet.has(pkg.token)) {
       map.set(pkg.token, pkg);
     }
@@ -229,13 +237,13 @@ export function useSelectedCustomPackagesMap() {
 
 export function useSelectedCount() {
   const selectedAppIds = usePackageStore((state) => state.selectedAppIds);
-  const selectedCustomPackageIds = usePackageStore(
-    (state) => state.selectedCustomPackageIds,
+  const selectedFullCatalogPackageIds = usePackageStore(
+    (state) => state.selectedFullCatalogPackageIds,
   );
   const hydrated = usePackageStore((state) => state.hydrated);
 
   if (!hydrated) return 0;
-  return selectedAppIds.length + selectedCustomPackageIds.length;
+  return selectedAppIds.length + selectedFullCatalogPackageIds.length;
 }
 
 export function useSelectedAppNames() {
@@ -251,8 +259,8 @@ export function useSelectedAppNames() {
 
 export function useSelectedTokens() {
   const selectedAppIds = usePackageStore((state) => state.selectedAppIds);
-  const selectedCustomPackageIds = usePackageStore(
-    (state) => state.selectedCustomPackageIds,
+  const selectedFullCatalogPackageIds = usePackageStore(
+    (state) => state.selectedFullCatalogPackageIds,
   );
   const hydrated = usePackageStore((state) => state.hydrated);
 
@@ -267,7 +275,7 @@ export function useSelectedTokens() {
     }
   }
 
-  for (const token of selectedCustomPackageIds) {
+  for (const token of selectedFullCatalogPackageIds) {
     tokens.add(token);
   }
 
@@ -276,17 +284,17 @@ export function useSelectedTokens() {
 
 export function useBrewCommands() {
   const selectedApps = useSelectedApps();
-  const selectedCustomPackagesMap = useSelectedCustomPackagesMap();
+  const selectedFullCatalogPackagesMap = useSelectedFullCatalogPackagesMap();
 
   const brewCommand = generateBulkBrewCommand(
     Array.from(selectedApps),
-    selectedCustomPackagesMap,
+    selectedFullCatalogPackagesMap,
     "install",
   );
 
   const uninstallCommand = generateBulkBrewCommand(
     Array.from(selectedApps),
-    selectedCustomPackagesMap,
+    selectedFullCatalogPackagesMap,
     "uninstall",
   );
 

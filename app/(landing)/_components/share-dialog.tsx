@@ -8,7 +8,7 @@ import { useBoolean, useCopyToClipboard } from "usehooks-ts";
 import { z } from "zod";
 import {
   useSelectedApps,
-  useSelectedCustomPackages,
+  useSelectedFullCatalogPackages,
 } from "@/app/(landing)/_hooks/use-package-store";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -60,10 +60,10 @@ export function ShareDialog({
 }: ShareDialogProps) {
   // Get selection data from Zustand store
   const selectedApps = useSelectedApps();
-  const selectedCustomPackages = useSelectedCustomPackages();
+  const selectedFullCatalogPackages = useSelectedFullCatalogPackages();
 
   const selectedAppIds = Array.from(selectedApps);
-  const fullCatalogPackageTokens = Array.from(selectedCustomPackages);
+  const fullCatalogPackageTokens = Array.from(selectedFullCatalogPackages);
 
   const {
     register,
