@@ -5,15 +5,15 @@ import { CheckIcon, CopyIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useClipboard } from "../_hooks/use-clipboard";
+import { useUninstallMode } from "../_hooks/use-uninstall-mode";
 
 interface CommandFooterProps {
   brewCommand: string;
   uninstallCommand: string;
   selectedCount: number;
-  copied: boolean;
-  isUninstallMode: boolean;
-  onCopy: () => void;
-  onToggleMode: () => void;
+  selectedApps?: string[]; // For analytics
+  customPackagesCount?: number; // For analytics
   onShare?: () => void;
 }
 
@@ -21,13 +21,26 @@ export function CommandFooter({
   brewCommand,
   uninstallCommand,
   selectedCount,
-  copied,
-  isUninstallMode,
-  onCopy,
-  onToggleMode,
+  selectedApps = [],
+  customPackagesCount = 0,
   onShare,
 }: CommandFooterProps) {
+  const { isUninstallMode, toggleMode } = useUninstallMode();
+  const { handleCopy, isCopied } = useClipboard();
+
   const displayCommand = isUninstallMode ? uninstallCommand : brewCommand;
+  const copied = isCopied(displayCommand);
+
+  const handleCopyClick = () => {
+    handleCopy(displayCommand, {
+      type: "brew_command",
+      command: displayCommand,
+      selectedAppsCount: selectedCount - customPackagesCount,
+      customPackagesCount,
+      isUninstallMode,
+      selectedApps,
+    });
+  };
   const commandLabel = isUninstallMode ? "uninstall" : "install";
   const controlHeight = "h-9 min-h-[36px]";
 
@@ -50,7 +63,7 @@ export function CommandFooter({
               </code>
             </div>
             <Button
-              onClick={onCopy}
+              onClick={handleCopyClick}
               disabled={!displayCommand}
               size="lg"
               className={cn(
@@ -98,7 +111,7 @@ export function CommandFooter({
               </span>
               <Switch
                 checked={isUninstallMode}
-                onCheckedChange={onToggleMode}
+                onCheckedChange={toggleMode}
                 aria-label="Toggle uninstall mode"
               />
             </div>
