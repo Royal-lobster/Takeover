@@ -99,7 +99,7 @@ export function InstallationHelpDialog({
                   </p>
 
                   <div className="overflow-hidden rounded-lg border bg-zinc-950 shadow-sm">
-                    <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-3 py-1">
+                    <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-3 h-9">
                       <div className="flex gap-1.5">
                         <div className="h-2 w-2 rounded-full bg-red-500/50" />
                         <div className="h-2 w-2 rounded-full bg-yellow-500/50" />
@@ -128,8 +128,12 @@ export function InstallationHelpDialog({
                     </div>
                     <div className="p-3 overflow-x-auto">
                       <code className="text-[11px] font-mono text-zinc-300 whitespace-pre-wrap break-all">
-                        <span className="text-green-400 mr-2">➜</span>
-                        <span className="text-blue-400 mr-2">~</span>
+                        <span className="text-green-400 mr-2 select-none">
+                          ➜
+                        </span>
+                        <span className="text-blue-400 mr-2 select-none">
+                          ~
+                        </span>
                         {HOMEBREW_INSTALL_COMMAND}
                       </code>
                     </div>
@@ -195,7 +199,7 @@ export function InstallationHelpDialog({
                   </p>
 
                   <div className="relative overflow-hidden rounded-lg border bg-zinc-950 shadow-sm">
-                    <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-3 py-1">
+                    <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-3 h-9">
                       <div className="flex gap-1.5">
                         <div className="h-2 w-2 rounded-full bg-red-500/50" />
                         <div className="h-2 w-2 rounded-full bg-yellow-500/50" />
@@ -212,8 +216,12 @@ export function InstallationHelpDialog({
                     </div>
                     <div className="p-3 overflow-x-auto">
                       <code className="text-[11px] font-mono text-zinc-300 whitespace-pre-wrap break-all">
-                        <span className="text-green-400 mr-2">➜</span>
-                        <span className="text-blue-400 mr-2">~</span>
+                        <span className="text-green-400 mr-2 select-none">
+                          ➜
+                        </span>
+                        <span className="text-blue-400 mr-2 select-none">
+                          ~
+                        </span>
                         {command}
                       </code>
                     </div>
@@ -231,7 +239,7 @@ export function InstallationHelpDialog({
                   </p>
 
                   <div className="overflow-hidden rounded-lg border bg-zinc-950 shadow-sm">
-                    <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-3 py-2">
+                    <div className="flex items-center border-b border-white/5 bg-white/5 px-3 h-9">
                       <div className="flex gap-1.5">
                         <div className="h-2 w-2 rounded-full bg-red-500/50" />
                         <div className="h-2 w-2 rounded-full bg-yellow-500/50" />
