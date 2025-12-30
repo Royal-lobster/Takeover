@@ -1,11 +1,23 @@
 "use client";
 
-import { CheckIcon, CopyIcon, ShareNetworkIcon } from "@phosphor-icons/react";
+import {
+  CheckIcon,
+  CopyIcon,
+  QuestionIcon,
+  ShareNetworkIcon,
+} from "@phosphor-icons/react";
+import { useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useCopyCommand } from "../_hooks/use-copy-command";
+import { InstallationHelpDialog } from "./installation-help-dialog";
 import { ShareDialog } from "./share-dialog";
 
 interface CommandFooterProps {
@@ -25,6 +37,8 @@ export function CommandFooter({
 }: CommandFooterProps) {
   const uninstallMode = useBoolean(false);
   const { handleCopy, isCopied } = useCopyCommand();
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const isUninstallMode = uninstallMode.value;
   const displayCommand = isUninstallMode ? uninstallCommand : brewCommand;
@@ -39,7 +53,15 @@ export function CommandFooter({
       isUninstallMode,
       selectedApps,
     });
+    // Open popover after copying
+    setPopoverOpen(true);
   };
+
+  const handleOpenHelp = () => {
+    setPopoverOpen(false);
+    setShowHelpDialog(true);
+  };
+
   const commandLabel = isUninstallMode ? "uninstall" : "install";
   const controlHeight = "h-9 min-h-[36px]";
 
@@ -61,27 +83,54 @@ export function CommandFooter({
                   : `$ brew ${commandLabel} --cask ...`}
               </code>
             </div>
-            <Button
-              onClick={handleCopyClick}
-              disabled={!displayCommand}
-              size="lg"
-              className={cn(
-                "shrink-0 gap-2 px-5 py-2.5 font-mono text-xs shadow-sm transition-all active:scale-95",
-                controlHeight,
-              )}
-            >
-              {copied ? (
-                <>
-                  <CheckIcon className="size-3.5" weight="bold" />
-                  COPIED
-                </>
-              ) : (
-                <>
-                  <CopyIcon className="size-3.5" />
-                  COPY
-                </>
-              )}
-            </Button>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+              <PopoverTrigger
+                onClick={handleCopyClick}
+                disabled={!displayCommand}
+                className={cn(
+                  "shrink-0 gap-2 px-5 py-2.5 font-mono text-xs shadow-sm transition-all active:scale-95 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50",
+                  controlHeight,
+                )}
+              >
+                {copied ? (
+                  <>
+                    <CheckIcon className="size-3.5" weight="bold" />
+                    COPIED
+                  </>
+                ) : (
+                  <>
+                    <CopyIcon className="size-3.5" />
+                    COPY
+                  </>
+                )}
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-80"
+                align="end"
+                side="top"
+                sideOffset={8}
+              >
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">
+                      Command copied!
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Not sure what to do next? We'll guide you through the
+                      process step by step.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleOpenHelp}
+                    className="w-full gap-2"
+                    size="sm"
+                  >
+                    <QuestionIcon className="size-4" weight="bold" />
+                    Show me how to install
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <ShareDialog
               disabled={!displayCommand}
               triggerProps={{
@@ -117,6 +166,14 @@ export function CommandFooter({
           </div>
         </div>
       </div>
+
+      {/* Installation Help Dialog */}
+      <InstallationHelpDialog
+        open={showHelpDialog}
+        onOpenChange={setShowHelpDialog}
+        command={displayCommand}
+        isUninstallMode={isUninstallMode}
+      />
     </footer>
   );
 }
