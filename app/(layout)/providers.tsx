@@ -6,6 +6,7 @@ import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { getQueryClient } from "@/lib/helpers/get-query-client";
 
 function PostHogProvider({ children }: { children: ReactNode }) {
@@ -29,6 +30,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <PostHogProvider>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>{children}</NuqsAdapter>
+        <Toaster />
       </QueryClientProvider>
     </PostHogProvider>
   );

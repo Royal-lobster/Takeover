@@ -6,7 +6,7 @@ import { useFullCatalog } from "@/app/(landing)/_hooks/use-full-catalog";
 
 export function useFullCatalogSearch(query: string) {
   const [debouncedQuery] = useDebounceValue(query, 300);
-  const { search, isReady, isLoading, error } = useFullCatalog();
+  const { search, isReady, isLoading, error, refresh } = useFullCatalog();
 
   const results = useMemo(() => {
     if (!isReady || debouncedQuery.trim().length < 2) {
@@ -25,9 +25,11 @@ export function useFullCatalogSearch(query: string) {
       results,
       isSearching,
       isCatalogReady: isReady,
+      isRefreshing: isLoading,
       error,
       query: debouncedQuery,
+      refresh,
     }),
-    [results, isSearching, isReady, error, debouncedQuery],
+    [results, isSearching, isReady, isLoading, error, debouncedQuery, refresh],
   );
 }

@@ -149,10 +149,38 @@ export function useFullCatalog() {
     [],
   );
 
+  const refresh = useCallback(async (): Promise<{
+    success: boolean;
+    count?: number;
+    error?: string;
+  }> => {
+    updateState({ isLoading: true });
+    try {
+      const packages = await fetchCatalog();
+      await savePackages(packages);
+      createSearchIndex(packages);
+      updateState({
+        isLoading: false,
+        isReady: true,
+        packageCount: packages.length,
+      });
+      return { success: true, count: packages.length };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to refresh catalog";
+      updateState({
+        isLoading: false,
+        error: error instanceof Error ? error : new Error(errorMessage),
+      });
+      return { success: false, error: errorMessage };
+    }
+  }, []);
+
   return {
     ...state,
     search,
     getPackage,
+    refresh,
   };
 }
 

@@ -3,6 +3,7 @@
 import {
   ArrowRight,
   ArrowSquareOut,
+  ArrowsClockwise,
   CheckIcon,
   MagnifyingGlassIcon,
   Package,
@@ -11,6 +12,7 @@ import {
   Star,
 } from "@phosphor-icons/react";
 import * as React from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -182,7 +184,8 @@ export function FullCatalogSearch({
   selectedTokens,
 }: FullCatalogSearchProps) {
   const [query, setQuery] = React.useState("");
-  const { results, isSearching } = useFullCatalogSearch(query);
+  const { results, isSearching, isRefreshing, refresh } =
+    useFullCatalogSearch(query);
 
   return (
     <Dialog>
@@ -221,6 +224,29 @@ export function FullCatalogSearch({
                     Search over 10,000+ formulae and casks
                   </p>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    const result = await refresh();
+                    if (result.success) {
+                      toast.success("Catalog synced", {
+                        description: `${result.count?.toLocaleString()} packages available`,
+                      });
+                    } else {
+                      toast.error("Sync failed", {
+                        description: result.error,
+                      });
+                    }
+                  }}
+                  disabled={isRefreshing}
+                  className="gap-1.5 font-mono text-xs"
+                >
+                  <ArrowsClockwise
+                    className={`size-3.5 ${isRefreshing ? "animate-spin" : ""}`}
+                  />
+                  {isRefreshing ? "Syncing..." : "Sync latest packages"}
+                </Button>
               </div>
             )}
             {query.trim().length >= 2 && isSearching && (
