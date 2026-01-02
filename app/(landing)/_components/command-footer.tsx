@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  CheckIcon,
-  CopyIcon,
-  QuestionIcon,
-  ShareNetworkIcon,
-} from "@phosphor-icons/react";
+import { CheckIcon, CopyIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useBoolean } from "usehooks-ts";
-import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -24,7 +18,6 @@ import { ShareDialog } from "./share-dialog";
 export function CommandFooter() {
   const uninstallMode = useBoolean(false);
   const { handleCopy, isCopied } = useCopyCommand();
-  const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const {
@@ -55,11 +48,6 @@ export function CommandFooter() {
     });
     // Open popover after copying
     setPopoverOpen(true);
-  };
-
-  const handleOpenHelp = () => {
-    setPopoverOpen(false);
-    setShowHelpDialog(true);
   };
 
   const commandLabel = isUninstallMode ? "uninstall" : "install";
@@ -129,15 +117,11 @@ export function CommandFooter() {
                     <p className="text-[11px] text-muted-foreground font-medium">
                       New to Terminal?
                     </p>
-                    <Button
-                      onClick={handleOpenHelp}
-                      variant="secondary"
-                      size="sm"
-                      className="h-7 px-3 text-xs gap-1.5"
-                    >
-                      <QuestionIcon className="size-3.5" weight="bold" />
-                      View Guide
-                    </Button>
+                    <InstallationHelpDialog
+                      command={displayCommand}
+                      isUninstallMode={isUninstallMode}
+                      onBeforeOpen={() => setPopoverOpen(false)}
+                    />
                   </div>
                 </div>
               </PopoverContent>
@@ -177,14 +161,6 @@ export function CommandFooter() {
           </div>
         </div>
       </div>
-
-      {/* Installation Help Dialog */}
-      <InstallationHelpDialog
-        open={showHelpDialog}
-        onOpenChange={setShowHelpDialog}
-        command={displayCommand}
-        isUninstallMode={isUninstallMode}
-      />
     </footer>
   );
 }

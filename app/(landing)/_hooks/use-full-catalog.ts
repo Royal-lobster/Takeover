@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import {
   getAllPackages,
   getLastUpdated,
@@ -66,6 +66,7 @@ const store: CatalogStore = {
   listeners: new Set(),
   initPromise: null,
 };
+let beforeUnloadRegistered = false;
 
 /**
  * Hook to manage the Homebrew full catalog.
@@ -79,55 +80,43 @@ const store: CatalogStore = {
  * All state is shared across hook instances.
  */
 export function useFullCatalog() {
-  const [state, setState] = useState(store.state);
   const hasInitialized = useRef(false);
 
+  const state = useSyncExternalStore(
+    (listener) => {
+      store.listeners.add(listener);
+      return () => store.listeners.delete(listener);
+    },
+    () => store.state,
+    () => store.state,
+  );
+
   useEffect(() => {
-    // Subscribe to store updates
-    const listener = () => setState(store.state);
-    store.listeners.add(listener);
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
 
-    // Initialize catalog after page load (using requestIdleCallback if available)
-    if (!hasInitialized.current && !store.initPromise) {
-      hasInitialized.current = true;
-
-      const init = () => {
-        // Double-check we haven't already started initialization
-        if (!store.initPromise) {
-          store.initPromise = initializeCatalog();
-        }
-      };
-
-      // Delay initialization to after page load
-      if (typeof window !== "undefined") {
-        if ("requestIdleCallback" in window) {
-          (
-            window as typeof window & {
-              requestIdleCallback: (cb: () => void) => number;
-            }
-          ).requestIdleCallback(init, { timeout: 2000 });
-        } else {
-          // Fallback for Safari
-          setTimeout(init, 100);
-        }
+    const init = () => {
+      if (!store.initPromise) {
+        store.initPromise = initializeCatalog();
       }
-    }
-
-    // Cleanup on page unload to prevent memory leaks
-    const handleBeforeUnload = () => {
-      clearIndex();
     };
 
     if (typeof window !== "undefined") {
-      window.addEventListener("beforeunload", handleBeforeUnload);
-    }
-
-    return () => {
-      store.listeners.delete(listener);
-      if (typeof window !== "undefined") {
-        window.removeEventListener("beforeunload", handleBeforeUnload);
+      if ("requestIdleCallback" in window) {
+        (
+          window as typeof window & {
+            requestIdleCallback: (cb: () => void) => number;
+          }
+        ).requestIdleCallback(init, { timeout: 2000 });
+      } else {
+        setTimeout(init, 100);
       }
-    };
+
+      if (!beforeUnloadRegistered) {
+        beforeUnloadRegistered = true;
+        window.addEventListener("beforeunload", clearIndex);
+      }
+    }
   }, []);
 
   const search = useCallback(

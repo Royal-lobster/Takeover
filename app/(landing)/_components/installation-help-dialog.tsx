@@ -6,12 +6,18 @@ import {
   CopyIcon,
   FolderIcon,
   MagnifyingGlassIcon,
+  QuestionIcon,
 } from "@phosphor-icons/react";
 import { defineStepper } from "@stepperize/react";
 import { useState } from "react";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Kbd } from "@/components/ui/kbd";
 import { cn } from "@/lib/utils";
 
@@ -23,20 +29,34 @@ const { useStepper } = defineStepper(
 );
 
 interface InstallationHelpDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   command: string;
   isUninstallMode?: boolean;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onBeforeOpen?: () => void;
 }
 
 export function InstallationHelpDialog({
   open,
+  defaultOpen = false,
   onOpenChange,
+  onBeforeOpen,
   command,
   isUninstallMode = false,
 }: InstallationHelpDialogProps) {
   const [, copy] = useCopyToClipboard();
   const [copiedCommand, setCopiedCommand] = useState<string>("");
+  const [internalOpen, setInternalOpen] = useState<boolean>(defaultOpen);
+  const isControlled = open !== undefined;
+  const dialogOpen = isControlled ? open : internalOpen;
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen);
+  };
   const stepper = useStepper();
 
   const HOMEBREW_INSTALL_COMMAND =
@@ -51,7 +71,18 @@ export function InstallationHelpDialog({
   const isCopied = (cmd: string) => copiedCommand === cmd;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
+      <DialogTrigger>
+        <Button
+          onClick={onBeforeOpen}
+          variant="secondary"
+          size="sm"
+          className="h-7 px-3 text-xs gap-1.5"
+        >
+          <QuestionIcon className="size-3.5" weight="bold" />
+          View Guide
+        </Button>
+      </DialogTrigger>
       <DialogContent className="max-w-md gap-0 p-0 overflow-hidden border-border/40 shadow-2xl">
         <DialogTitle className="sr-only">Installation Guide</DialogTitle>
 
@@ -297,7 +328,7 @@ export function InstallationHelpDialog({
           {stepper.isLast ? (
             <Button
               size="sm"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
               className="px-6"
             >
               Finish

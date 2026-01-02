@@ -9,15 +9,21 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { getQueryClient } from "@/lib/helpers/get-query-client";
 
+let posthogInitialized = false;
+
 function PostHogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
-    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY as string, {
+    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+    if (!key || posthogInitialized) return;
+
+    posthog.init(key, {
       api_host: "/ingest",
       ui_host: "https://us.posthog.com",
       defaults: "2025-05-24",
       capture_exceptions: true,
       debug: process.env.NODE_ENV === "development",
     });
+    posthogInitialized = true;
   }, []);
 
   return <PHProvider client={posthog}>{children}</PHProvider>;
