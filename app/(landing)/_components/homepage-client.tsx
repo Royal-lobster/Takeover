@@ -1,11 +1,11 @@
 "use client";
 
+import { useQueryState } from "nuqs";
+import { useState } from "react";
 import type { App, AppCategory } from "@/lib/data/schema";
 import { CATEGORIES } from "@/lib/data/schema";
 import type { FullCatalogPackage } from "@/lib/helpers/brew-commands";
 import type { SearchResult } from "@/lib/integrations/search";
-import { useQueryState } from "nuqs";
-import { useState } from "react";
 import { useFilteredApps } from "../_hooks/use-filtered-apps";
 import { usePackageSelection } from "../_hooks/use-package-selection";
 import { AppGrid, AppGridByCategory } from "./app-grid-by-category";
@@ -70,6 +70,15 @@ export function HomePageClient({
 
   const showCategorySections = selectedCategory === "all" && !hasSearchQuery;
 
+  // Get all selected apps (curated + full catalog)
+  const allSelectedApps = [
+    ...selectedAppNames,
+    ...Array.from(selectedFullCatalogPackages),
+  ];
+
+  // Get only full catalog apps (not from curation)
+  const selectedFullCatalogApps = Array.from(selectedFullCatalogPackages);
+
   return (
     <>
       <Header selectedCount={selectedCount} onClearAll={clearAll} />
@@ -122,8 +131,9 @@ export function HomePageClient({
         brewCommand={brewCommand}
         uninstallCommand={uninstallCommand}
         selectedCount={selectedCount}
-        selectedApps={selectedAppNames}
+        selectedApps={allSelectedApps}
         fullCatalogPackagesCount={selectedFullCatalogPackages.size}
+        fullCatalogApps={selectedFullCatalogApps}
       />
     </>
   );

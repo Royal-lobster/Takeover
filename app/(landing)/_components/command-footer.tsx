@@ -26,6 +26,7 @@ interface CommandFooterProps {
   selectedCount: number;
   selectedApps?: string[]; // For analytics
   fullCatalogPackagesCount?: number; // For analytics
+  fullCatalogApps?: string[]; // For analytics
 }
 
 export function CommandFooter({
@@ -34,6 +35,7 @@ export function CommandFooter({
   selectedCount,
   selectedApps = [],
   fullCatalogPackagesCount = 0,
+  fullCatalogApps = [],
 }: CommandFooterProps) {
   const uninstallMode = useBoolean(false);
   const { handleCopy, isCopied } = useCopyCommand();
@@ -52,6 +54,7 @@ export function CommandFooter({
       fullCatalogPackagesCount,
       isUninstallMode,
       selectedApps,
+      fullCatalogApps,
     });
     // Open popover after copying
     setPopoverOpen(true);
