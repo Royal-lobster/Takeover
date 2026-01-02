@@ -17,34 +17,31 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useCopyCommand } from "../_hooks/use-copy-command";
+import { usePackageState } from "../_hooks/use-package-state";
 import { InstallationHelpDialog } from "./installation-help-dialog";
 import { ShareDialog } from "./share-dialog";
 
-interface CommandFooterProps {
-  brewCommand: string;
-  uninstallCommand: string;
-  selectedCount: number;
-  selectedApps?: string[]; // For analytics
-  fullCatalogPackagesCount?: number; // For analytics
-  fullCatalogApps?: string[]; // For analytics
-}
-
-export function CommandFooter({
-  brewCommand,
-  uninstallCommand,
-  selectedCount,
-  selectedApps = [],
-  fullCatalogPackagesCount = 0,
-  fullCatalogApps = [],
-}: CommandFooterProps) {
+export function CommandFooter() {
   const uninstallMode = useBoolean(false);
   const { handleCopy, isCopied } = useCopyCommand();
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
+  const {
+    brewCommand,
+    uninstallCommand,
+    selectedCount,
+    selectedAppNames,
+    selectedFullCatalogPackages,
+  } = usePackageState();
+
   const isUninstallMode = uninstallMode.value;
   const displayCommand = isUninstallMode ? uninstallCommand : brewCommand;
   const copied = isCopied(displayCommand);
+
+  const fullCatalogPackagesCount = selectedFullCatalogPackages.size;
+  const fullCatalogApps = Array.from(selectedFullCatalogPackages);
+  const selectedApps = [...selectedAppNames, ...fullCatalogApps];
 
   const handleCopyClick = () => {
     handleCopy(displayCommand, {

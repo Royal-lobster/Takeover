@@ -1,13 +1,12 @@
 "use client";
 
 import { useQueryState } from "nuqs";
-import { useState } from "react";
-import type { App, AppCategory } from "@/lib/data/schema";
 import { CATEGORIES } from "@/lib/data/schema";
-import type { FullCatalogPackage } from "@/lib/helpers/brew-commands";
-import type { SearchResult } from "@/lib/integrations/search";
+import { CategoryProvider, useCategory } from "../_hooks/use-category";
 import { useFilteredApps } from "../_hooks/use-filtered-apps";
-import { usePackageSelection } from "../_hooks/use-package-selection";
+import { usePackageActions } from "../_hooks/use-package-actions";
+import { usePackageState } from "../_hooks/use-package-state";
+import { useUrlInitialization } from "../_hooks/use-url-initialization";
 import { AppGrid, AppGridByCategory } from "./app-grid-by-category";
 import { Categories } from "./categories";
 import { CommandFooter } from "./command-footer";
@@ -34,33 +33,67 @@ export function HomePageClient({
   initialSelectedAppIds,
   initialFullCatalogPackages,
 }: HomePageClientProps) {
-  // Package selection state (apps + full catalog packages)
-  const {
-    selectedApps,
-    toggleApp,
-    fullCatalogPackages,
-    selectedFullCatalogPackages,
-    sharedFullCatalogTokens,
-    toggleFullCatalogPackage,
-    removeFullCatalogPackage,
-    handleSelectPackage,
-    selectedCount,
-    selectedAppNames,
-    selectedTokens,
-    brewCommand,
-    uninstallCommand,
-    clearAll,
-  } = usePackageSelection(initialSelectedAppIds, initialFullCatalogPackages);
+  // URL initialization only
+  useUrlInitialization(initialSelectedAppIds, initialFullCatalogPackages);
 
-  // UI state
+  return (
+    <CategoryProvider>
+      <Header
+        initialSelectedAppIds={initialSelectedAppIds}
+        initialFullCatalogPackages={initialFullCatalogPackages}
+      />
+
+      <main className="flex-1 pb-24">
+        <Categories categories={CATEGORIES} />
+
+        <div className="mx-auto max-w-6xl px-4 py-6">
+          {kitName && (
+            <KitSection
+              name={kitName}
+              description={kitDescription}
+              selectedAppIds={initialSelectedAppIds}
+              fullCatalogPackages={initialFullCatalogPackages}
+            />
+          )}
+
+          <MainContent />
+        </div>
+      </main>
+
+      <CommandFooter />
+    </CategoryProvider>
+  );
+}
+
+function MainContent() {
+  // Get search query from URL
   const [searchQueryRaw] = useQueryState("search", {
     defaultValue: "",
     clearOnDefault: true,
   });
   const searchQuery = searchQueryRaw ?? "";
-  const [selectedCategory, setSelectedCategory] = useState<AppCategory | "all">(
-    "all",
-  );
+
+  // Get category selection from context
+  const { selectedCategory } = useCategory();
+
+  // Get shared full catalog tokens for URL initialization
+  const { sharedFullCatalogTokens } = useUrlInitialization([], []);
+
+  // Package state
+  const {
+    selectedApps,
+    fullCatalogPackages,
+    selectedFullCatalogPackages,
+    selectedTokens,
+  } = usePackageState();
+
+  // Package actions
+  const {
+    toggleApp,
+    toggleFullCatalogPackage,
+    removeFullCatalogPackage,
+    handleSelectPackage,
+  } = usePackageActions(sharedFullCatalogTokens);
 
   // Filtered apps based on search and category
   const { filteredApps, appsByCategory, hasSearchQuery } = useFilteredApps(
@@ -70,110 +103,6 @@ export function HomePageClient({
 
   const showCategorySections = selectedCategory === "all" && !hasSearchQuery;
 
-  // Get all selected apps (curated + full catalog)
-  const allSelectedApps = [
-    ...selectedAppNames,
-    ...Array.from(selectedFullCatalogPackages),
-  ];
-
-  // Get only full catalog apps (not from curation)
-  const selectedFullCatalogApps = Array.from(selectedFullCatalogPackages);
-
-  return (
-    <>
-      <Header selectedCount={selectedCount} onClearAll={clearAll} />
-
-      <main className="flex-1 pb-24">
-        <div className="border-b border-border">
-          <div className="mx-auto max-w-6xl px-4 py-2">
-            <Categories
-              categories={CATEGORIES}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-            />
-          </div>
-        </div>
-
-        <div className="mx-auto max-w-6xl px-4 py-6">
-          {kitName && (
-            <KitSection
-              name={kitName}
-              description={kitDescription}
-              selectedAppIds={initialSelectedAppIds}
-              fullCatalogPackages={initialFullCatalogPackages}
-              selectedApps={selectedApps}
-              selectedTokens={selectedTokens}
-              onToggleApp={toggleApp}
-              onToggleFullCatalogPackage={toggleFullCatalogPackage}
-            />
-          )}
-
-          <AppContent
-            hasSearchQuery={hasSearchQuery}
-            searchQuery={searchQuery}
-            showCategorySections={showCategorySections}
-            filteredApps={filteredApps}
-            appsByCategory={appsByCategory}
-            selectedApps={selectedApps}
-            selectedTokens={selectedTokens}
-            onToggleApp={toggleApp}
-            onSelectPackage={handleSelectPackage}
-            fullCatalogPackages={fullCatalogPackages}
-            selectedFullCatalogPackages={selectedFullCatalogPackages}
-            sharedFullCatalogTokens={sharedFullCatalogTokens}
-            onToggleFullCatalogPackage={toggleFullCatalogPackage}
-            onRemoveFullCatalogPackage={removeFullCatalogPackage}
-          />
-        </div>
-      </main>
-
-      <CommandFooter
-        brewCommand={brewCommand}
-        uninstallCommand={uninstallCommand}
-        selectedCount={selectedCount}
-        selectedApps={allSelectedApps}
-        fullCatalogPackagesCount={selectedFullCatalogPackages.size}
-        fullCatalogApps={selectedFullCatalogApps}
-      />
-    </>
-  );
-}
-
-// --- Content Section Components ---
-
-interface AppContentProps {
-  hasSearchQuery: boolean;
-  searchQuery: string;
-  showCategorySections: boolean;
-  filteredApps: App[];
-  appsByCategory: Map<AppCategory, App[]>;
-  selectedApps: Set<string>;
-  selectedTokens: Set<string>;
-  onToggleApp: (appId: string) => void;
-  onSelectPackage: (pkg: SearchResult) => void;
-  fullCatalogPackages: Map<string, FullCatalogPackage>;
-  selectedFullCatalogPackages: Set<string>;
-  sharedFullCatalogTokens: Set<string>;
-  onToggleFullCatalogPackage: (token: string) => void;
-  onRemoveFullCatalogPackage: (token: string) => void;
-}
-
-function AppContent({
-  hasSearchQuery,
-  searchQuery,
-  showCategorySections,
-  filteredApps,
-  appsByCategory,
-  selectedApps,
-  selectedTokens,
-  onToggleApp,
-  onSelectPackage,
-  fullCatalogPackages,
-  selectedFullCatalogPackages,
-  sharedFullCatalogTokens,
-  onToggleFullCatalogPackage,
-  onRemoveFullCatalogPackage,
-}: AppContentProps) {
   if (hasSearchQuery) {
     return (
       <div className="space-y-8">
@@ -182,15 +111,15 @@ function AppContent({
           filteredApps={filteredApps}
           selectedApps={selectedApps}
           selectedTokens={selectedTokens}
-          onToggleApp={onToggleApp}
-          onSelectPackage={onSelectPackage}
+          onToggleApp={toggleApp}
+          onSelectPackage={handleSelectPackage}
         />
         <FullCatalogPackagesSection
           packages={fullCatalogPackages}
           selectedTokens={selectedFullCatalogPackages}
           sharedTokens={sharedFullCatalogTokens}
-          onToggle={onToggleFullCatalogPackage}
-          onRemove={onRemoveFullCatalogPackage}
+          onToggle={toggleFullCatalogPackage}
+          onRemove={removeFullCatalogPackage}
         />
       </div>
     );
@@ -202,17 +131,17 @@ function AppContent({
         <AppGridByCategory
           appsByCategory={appsByCategory}
           selectedApps={selectedApps}
-          onToggleApp={onToggleApp}
+          onToggleApp={toggleApp}
         />
         <FullCatalogPackagesSection
           packages={fullCatalogPackages}
           selectedTokens={selectedFullCatalogPackages}
           sharedTokens={sharedFullCatalogTokens}
-          onToggle={onToggleFullCatalogPackage}
-          onRemove={onRemoveFullCatalogPackage}
+          onToggle={toggleFullCatalogPackage}
+          onRemove={removeFullCatalogPackage}
         />
         <FullCatalogSearch
-          onSelectPackage={onSelectPackage}
+          onSelectPackage={handleSelectPackage}
           selectedTokens={selectedTokens}
         />
       </div>
@@ -225,17 +154,17 @@ function AppContent({
       <AppGrid
         apps={filteredApps}
         selectedApps={selectedApps}
-        onToggleApp={onToggleApp}
+        onToggleApp={toggleApp}
       />
       <FullCatalogPackagesSection
         packages={fullCatalogPackages}
         selectedTokens={selectedFullCatalogPackages}
         sharedTokens={sharedFullCatalogTokens}
-        onToggle={onToggleFullCatalogPackage}
-        onRemove={onRemoveFullCatalogPackage}
+        onToggle={toggleFullCatalogPackage}
+        onRemove={removeFullCatalogPackage}
       />
       <FullCatalogSearch
-        onSelectPackage={onSelectPackage}
+        onSelectPackage={handleSelectPackage}
         selectedTokens={selectedTokens}
       />
     </div>

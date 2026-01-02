@@ -1,6 +1,9 @@
 "use client";
 
 import { CURATED_APPS } from "@/lib/data/curated-catalogue";
+import { usePackageActions } from "../_hooks/use-package-actions";
+import { usePackageState } from "../_hooks/use-package-state";
+import { useUrlInitialization } from "../_hooks/use-url-initialization";
 import { AppSelectionCard } from "./app-selection-card";
 import { FullCatalogSelectionCard } from "./full-catalog-selection-card";
 
@@ -13,10 +16,6 @@ interface KitSectionProps {
     name: string;
     type: "cask" | "formula";
   }>;
-  selectedApps: Set<string>;
-  selectedTokens: Set<string>;
-  onToggleApp: (appId: string) => void;
-  onToggleFullCatalogPackage: (token: string) => void;
 }
 
 export function KitSection({
@@ -24,11 +23,17 @@ export function KitSection({
   description,
   selectedAppIds,
   fullCatalogPackages,
-  selectedApps,
-  selectedTokens,
-  onToggleApp,
-  onToggleFullCatalogPackage,
 }: KitSectionProps) {
+  const { sharedFullCatalogTokens } = useUrlInitialization(
+    selectedAppIds,
+    fullCatalogPackages,
+  );
+
+  const { selectedApps, selectedTokens } = usePackageState();
+  const { toggleApp, toggleFullCatalogPackage } = usePackageActions(
+    sharedFullCatalogTokens,
+  );
+
   const preselectedApps = CURATED_APPS.filter((app) =>
     selectedAppIds.includes(app.id),
   );
@@ -66,7 +71,7 @@ export function KitSection({
                   name={app.name}
                   app={app}
                   isSelected={isSelected}
-                  onToggle={onToggleApp}
+                  onToggle={toggleApp}
                   showInfoPopover={true}
                 />
               );
@@ -79,7 +84,7 @@ export function KitSection({
                   key={pkg.token}
                   package={pkg}
                   isSelected={isSelected}
-                  onToggle={onToggleFullCatalogPackage}
+                  onToggle={toggleFullCatalogPackage}
                 />
               );
             })}

@@ -14,18 +14,37 @@ import type * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { usePackageActions } from "../_hooks/use-package-actions";
+import { usePackageState } from "../_hooks/use-package-state";
+import { useUrlInitialization } from "../_hooks/use-url-initialization";
 import { SyncDialog } from "./sync-dialog";
 
 interface HeaderProps {
-  selectedCount: number;
-  onClearAll: () => void;
+  initialSelectedAppIds: string[];
+  initialFullCatalogPackages: Array<{
+    token: string;
+    name: string;
+    type: "cask" | "formula";
+  }>;
 }
 
-export function Header({ selectedCount, onClearAll }: HeaderProps) {
+export function Header({
+  initialSelectedAppIds,
+  initialFullCatalogPackages,
+}: HeaderProps) {
   const [searchQuery = "", setSearchQuery] = useQueryState("search", {
     defaultValue: "",
     clearOnDefault: true,
   });
+
+  const { sharedFullCatalogTokens } = useUrlInitialization(
+    initialSelectedAppIds,
+    initialFullCatalogPackages,
+  );
+
+  const { selectedCount } = usePackageState();
+  const { clearAll } = usePackageActions(sharedFullCatalogTokens);
+
   const hasSelection = selectedCount > 0;
 
   return (
@@ -111,7 +130,7 @@ export function Header({ selectedCount, onClearAll }: HeaderProps) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={onClearAll}
+              onClick={clearAll}
               disabled={!hasSelection}
               className={cn(
                 "gap-1.5 font-mono text-xs transition-all duration-200",
@@ -145,7 +164,7 @@ export function Header({ selectedCount, onClearAll }: HeaderProps) {
               {/* Selection badge with clear action */}
               <button
                 type="button"
-                onClick={onClearAll}
+                onClick={clearAll}
                 disabled={!hasSelection}
                 className={cn(
                   "flex h-7 items-center gap-1.5 rounded-full bg-foreground/10 px-2.5 font-mono text-xs font-medium transition-all duration-200",
