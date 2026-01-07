@@ -1602,7 +1602,7 @@ const PACKAGE_MANAGERS_APPS: Array<App> = [
   {
     id: "bun",
     name: "Bun",
-    brewName: "bun",
+    brewName: "oven-sh/bun/bun",
     category: AppCategoryEnum.enum["package-managers"],
     description: "Fast all-in-one JavaScript runtime",
     iconUrl: favicon("bun.sh"),
